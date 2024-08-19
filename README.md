@@ -1,4 +1,4 @@
-# TailAdmin Next.js - Free Next.js Tailwind Admin Dashboard Template
+<!-- # TailAdmin Next.js - Free Next.js Tailwind Admin Dashboard Template
 
 TailAdmin is a free and open-source admin dashboard template built on **Next.js and Tailwind CSS** providing developers with everything they need to create a feature-rich and data-driven: back-end, dashboard, or admin panel solution for any sort of web project.
 
@@ -131,4 +131,4 @@ If you like the template, please star this repository to inspire the team to cre
 
 ### Version 0.1.0 - Initial Release - [Aug 3, 2023]
 
-- Initial release of TailAdmin Next.
+- Initial release of TailAdmin Next. -->
