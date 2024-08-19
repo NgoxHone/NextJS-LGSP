@@ -1,9 +1,11 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { dataEx } from './data'
+import { dataEx } from "./data";
+import { fetchData } from "../../../utilities/GlobalFunction";
+import { bodyByWeek } from "./body";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
@@ -74,18 +76,49 @@ interface ChartTwoState {
     data: number[];
   }[];
 }
+function getDatesOfCurrentWeek() {
+  const today = new Date();
+  const startOfWeek = today.getDate() - today.getDay() + 1; // Đặt ngày thứ hai của tuần hiện tại
+  const endOfWeek = startOfWeek + 6; // Ngày chủ nhật của tuần hiện tại
+
+  const dates = [];
+  for (let i = startOfWeek; i <= endOfWeek; i++) {
+    const date = new Date(today.setDate(i));
+    // Reset lại ngày để tránh ảnh hưởng từ vòng lặp
+    today.setDate(today.getDate() - (i - startOfWeek));
+    dates.push(date.getDate());
+  }
+
+  return dates;
+}
+function getCurrentMonth() {
+  const today = new Date();
+  const month = today.getMonth(); // Tháng hiện tại (0 - 11)
+  return month + 1; // Thay đổi để tháng là từ 1 đến 12
+}
 
 const ChartTwo: React.FC = () => {
-  const [data, setData] = useState(dataEx)
+  const [data, setData] = useState(dataEx);
+  const [loading, setLoading] = useState(false);
 
-
-
-  const temp = data.aggregations.count_by_day.buckets.map(bucket => bucket.doc_count);
-  const series = [{
-    name: "Sales",
-    data: temp
-  }];
-  console.log(series)
+  const fetchDocuments = () => {
+    setLoading(true);
+    fetchData(
+      bodyByWeek(getDatesOfCurrentWeek(), [getCurrentMonth()]),
+      setData,
+    ).finally(() => setLoading(false));
+  };
+  useEffect(() => fetchDocuments(), []);
+  const temp = data.aggregations.count_by_day.buckets.map(
+    (bucket) => bucket.doc_count,
+  );
+  const series = [
+    {
+      name: "Sales",
+      data: temp,
+    },
+  ];
+  console.log(series);
   // const series = [
   //   {
   //     name: "Sales",
@@ -98,7 +131,7 @@ const ChartTwo: React.FC = () => {
   // ];
 
   return (
-    <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
+    <div className="col-span-12 rounded-lg border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
       <div className="mb-4 justify-between gap-4 sm:flex">
         <div>
           <h4 className="text-xl font-semibold text-black dark:text-white">

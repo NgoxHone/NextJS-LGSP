@@ -7,12 +7,17 @@ import ChatCard from "../Chat/ChatCard";
 import TableOne from "../Tables/TableOne";
 import CardDataStats from "../CardDataStats";
 import axios from "axios";
-import data from "./data"
+import data from "./data";
 import TableTwo from "../Tables/TableTwo";
 import TableThree from "../Tables/TableThree";
 import TableFour from "../Tables/TableFour";
 import TableFive from "../Tables/TableFive";
-import { getTimestampRanges } from "../../../utilities/GlobalFunction"
+import {
+  convertDateToMilliseconds,
+  fetchData,
+  getTimestampRanges,
+} from "../../../utilities/GlobalFunction";
+import { data1, TotalDV, TotalPN, TotalRequest, TotalToday } from "./body";
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
 });
@@ -20,65 +25,99 @@ const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
 const ChartThree = dynamic(() => import("@/components/Charts/ChartThree"), {
   ssr: false,
 });
-const data1 = {
-  index: "apim-request-index/_search", body: {
-    "size": 0,
-    "query": {
-      "bool": {
-        "filter": [
-          {
-            "range": {
-              "date_created": {
-                "gt": "1710223296000",
-                "lt": "1712902009000"
-              }
-            }
-          },
-          {
-            "term": {
-              "am_key_type": "PRODUCTION"
-            }
-          }
-        ]
-      }
-    },
-    "aggs": {
-      "group_by_api": {
-        "terms": {
-          "field": "api"
-        }
-      }
-    }
-  }
+const { today, yesterday } = getTimestampRanges();
+const getTodayDate = () => {
+  const today = new Date();
+  return today.toISOString().split("T")[0];
 };
-const { today, yesterday } = getTimestampRanges()
+
+const getLastMonthDate = () => {
+  const lastMonth = new Date();
+  lastMonth.setMonth(lastMonth.getMonth() - 1);
+  return lastMonth.toISOString().split("T")[0];
+};
 const ECommerce = () => {
   const [documents, setDocuments] = useState(data);
-  const [loading, setLoading] = useState(true);
-  const [Total, setTotal] = useState(20219282)
+  const [loading, setLoading] = useState(false);
+  const [Total, setTotal] = useState(0);
+  const [TotalPNs, setTotalPN] = useState(0);
+  const [TotalAPI, setTotalAPI] = useState(0);
+  const [TotalAPIToday, setTotalAPIToday] = useState(0);
+  const [startDate, setStartDate] = useState(
+    convertDateToMilliseconds(getLastMonthDate()),
+  );
+  const [endDate, setEndDate] = useState(
+    convertDateToMilliseconds(getTodayDate()),
+  );
+  console.log(today, yesterday);
+
+  const fetchDocuments = () => {
+    setLoading(true);
+    fetchData(data1(startDate, endDate), setDocuments).finally(() =>
+      setLoading(false),
+    );
+  };
+
+  const fetchTotalRequest = () => {
+    fetchData(TotalRequest, (dataRes) => setTotal(dataRes?.count));
+  };
+
+  const fetchTotalPhanMem = () => {
+    fetchData(TotalPN, (dataRes) =>
+      setTotalPN(dataRes?.aggregations?.application_name_count?.value),
+    );
+  };
+
+  const fetchTotalAPI = () => {
+    fetchData(TotalDV, (dataRes) =>
+      setTotalAPI(dataRes?.aggregations?.application_name_count?.value),
+    );
+  };
+  const fetchTotalAPIToday = () => {
+    fetchData(TotalToday(today, yesterday), (dataRes) =>
+      setTotalAPIToday(dataRes?.aggregations?.counts_by_date?.buckets),
+    );
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios({
-          method: 'post', url: "/api/service", headers: {
-            'Content-Type': 'application/json'
-          },
-          data: data1
-        });
-        const dataRes = response.data;
-        setDocuments(dataRes);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching documents:', error);
-      }
-    };
-    fetchData();
+    fetchDocuments();
+  }, [startDate, endDate]);
+  useEffect(() => {
+    fetchTotalRequest();
+    fetchTotalPhanMem();
+    fetchTotalAPI();
+    fetchTotalAPIToday();
   }, []);
-  // console.log(documents)
+  function calculatePercentageChange(today, yesterday) {
+    return (
+      (Math.round(((today - yesterday) / yesterday) * 10000) / 100).toFixed(2) +
+      "%"
+    );
+  }
+
+  function isLevelUp(today, yesterday) {
+    return today > yesterday;
+  }
+
+  function isLevelDown(today, yesterday) {
+    return today < yesterday;
+  }
+
+  const handleStartDateChange = (date) => {
+    setStartDate(convertDateToMilliseconds(date));
+  };
+
+  const handleEndDateChange = (date) => {
+    setEndDate(convertDateToMilliseconds(date));
+  };
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardDataStats title="Request" total={Total.toLocaleString("de-DE")} rate="0.43%" levelUp>
+        <CardDataStats
+          title="Request"
+          total={Total.toLocaleString("de-DE")}
+          rate="0.43%"
+          levelUp
+        >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -97,7 +136,7 @@ const ECommerce = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Dịch vụ" total="40" rate="4.35%" levelUp>
+        <CardDataStats title="Dịch vụ" total={TotalAPI} rate="4.35%" levelUp>
           <svg
             className="fill-primary dark:fill-white"
             width="20"
@@ -120,7 +159,7 @@ const ECommerce = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Product" total="16">
+        <CardDataStats title="Total Product" total={TotalPNs}>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -139,7 +178,22 @@ const ECommerce = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Request hôm nay" total="6229" rate={Math.round(((6229 - 59983) / 59983) * 100).toString() + "%"} levelDown>
+        <CardDataStats
+          title="Request hôm nay"
+          total={TotalAPIToday?.today?.doc_count}
+          rate={calculatePercentageChange(
+            TotalAPIToday?.today?.doc_count,
+            TotalAPIToday?.yesterday?.doc_count,
+          )}
+          levelUp={isLevelUp(
+            TotalAPIToday?.today?.doc_count,
+            TotalAPIToday?.yesterday?.doc_count,
+          )}
+          levelDown={isLevelDown(
+            TotalAPIToday?.today?.doc_count,
+            TotalAPIToday?.yesterday?.doc_count,
+          )}
+        >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -172,18 +226,25 @@ const ECommerce = () => {
           {/* <TableOne /> */}
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5" style={{ display: 'flex', alignItems: 'stretch' }}>
-        <div className="col-span-12 xl:col-span-8">
-          <TableFive data={documents} />
+      <div
+        className="mt-4 flex flex-col gap-4 md:mt-6 md:mt-6 md:gap-6 xl:flex-row 2xl:mt-7.5 "
+        style={{ alignItems: "stretch" }}
+      >
+        <div className="w-full xl:w-2/3">
+          <TableFive
+            onStartDateChange={handleStartDateChange}
+            onEndDateChange={handleEndDateChange}
+            data={documents}
+          />
         </div>
-        <div className="col-span-12 xl:col-span-4">
+        <div className="mt-4 w-full xl:mt-0 xl:w-1/3">
           <ChatCard />
         </div>
       </div>
+
       {/* <div className="mt-4 mb-4">
         <TableFour />
       </div> */}
-
     </>
   );
 };

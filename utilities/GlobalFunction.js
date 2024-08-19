@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const getTimestampRanges = () => {
   // Lấy thời điểm hiện tại
   const now = new Date();
@@ -21,11 +23,11 @@ export const getTimestampRanges = () => {
 
   return {
     today: {
-      gte: startOfToday,
+      gt: startOfToday,
       lt: endOfToday,
     },
     yesterday: {
-      gte: startOfYesterday,
+      gt: startOfYesterday,
       lt: endOfYesterday,
     },
   };
@@ -44,3 +46,25 @@ export function formatTimestampToDate(timestamp) {
 
   return `${day}/${month}/${year} - ${hours}:${minutes}:${seconds}`;
 }
+
+export const convertDateToMilliseconds = (dateString) => {
+  const date = new Date(dateString);
+  return date.getTime();
+};
+
+export const fetchData = async (data, setState, path = "/api/service") => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: path,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    });
+    const dataRes = response.data;
+    setState(dataRes);
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+  }
+};

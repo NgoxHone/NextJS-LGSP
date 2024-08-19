@@ -1,13 +1,14 @@
 "use client";
 
 import { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { data2 } from "./data"
+import { data2 } from "./data";
+import { fetchData } from "../../../utilities/GlobalFunction";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
-
+import { bodyByYear } from "./body";
 const options: ApexOptions = {
   legend: {
     show: false,
@@ -129,10 +130,18 @@ interface ChartOneState {
 }
 
 const ChartOne: React.FC = () => {
-  const [dataChar, setDataChar] = useState(data2)
+  const [dataChar, setDataChar] = useState(data2);
+  const [loading, setLoading] = useState(false);
 
-  const temp = (dataChar.aggregations.count_by_month.buckets.map(i => i.doc_count))
-  const data = [{ name: '', data: temp }]
+  const fetchDocuments = () => {
+    setLoading(true);
+    fetchData(bodyByYear(), setDataChar).finally(() => setLoading(false));
+  };
+  useEffect(() => fetchDocuments(), []);
+  const temp = dataChar.aggregations.count_by_month.buckets.map(
+    (i) => i.doc_count,
+  );
+  const data = [{ name: "", data: temp }];
   // let data = [
   //   // {
   //   //   name: "Product One",
@@ -149,7 +158,7 @@ const ChartOne: React.FC = () => {
   //   }
   // ]
   return (
-    <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
+    <div className="col-span-12 rounded-lg border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
       <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
         <div className="flex w-full flex-wrap gap-3 sm:gap-5">
           <div className="flex min-w-47.5">
