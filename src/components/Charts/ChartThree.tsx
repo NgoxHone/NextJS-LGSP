@@ -8,17 +8,15 @@ interface ChartThreeProps {
 }
 
 const ChartThree: React.FC<ChartThreeProps> = ({ data, title }) => {
-  // Chuyển đổi dữ liệu thành định dạng mà ApexCharts yêu cầu
   const series = data.map((item) => item.doc_count);
   const labels = data.map((item) => item.key);
 
-  // Cấu hình chart
   const options: ApexOptions = {
     chart: {
       fontFamily: "Satoshi, sans-serif",
       type: "donut",
     },
-    colors: ["#3C50E0", "#6577F3", "#8FD0EF", "#0FADCF", "#FF7F7F", "#F5A623"], // Thêm màu cho các mục
+    colors: ["#3C50E0", "#6577F3", "#8FD0EF", "#0FADCF", "#FF7F7F", "#F5A623"],
     labels: labels,
     legend: {
       show: true,
@@ -45,10 +43,26 @@ const ChartThree: React.FC<ChartThreeProps> = ({ data, title }) => {
         },
       },
       {
-        breakpoint: 640,
+        breakpoint: 1024, // Tablet
         options: {
           chart: {
-            width: 200,
+            width: 300, // Tăng kích thước khi ở chế độ tablet
+          },
+        },
+      },
+      {
+        breakpoint: 768, // Điện thoại
+        options: {
+          chart: {
+            width: 250, // Tăng kích thước khi ở chế độ điện thoại
+          },
+        },
+      },
+      {
+        breakpoint: 640, // Điện thoại nhỏ hơn
+        options: {
+          chart: {
+            width: 200, // Đảm bảo kích thước biểu đồ không quá nhỏ
           },
         },
       },

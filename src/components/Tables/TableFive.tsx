@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import useDebounce from "../../hooks/useDebounce";
 import MultiSelect from "../FormElements/MultiSelect";
+import { getDatabaseDescription } from "../../../utilities/GlobalFunction";
 const Table = ({ data, onStartDateChange, onEndDateChange }) => {
   const { aggregations } = data;
   const getTodayDate = () => {
@@ -34,18 +35,35 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
-      filteredData.map((bucket) => ({
-        "Dịch vụ": bucket.key,
+      filteredData.map((bucket, index) => ({
+        STT: index + 1,
+        "Dịch vụ": getDatabaseDescription(bucket.key),
         "Số lượng request": bucket.doc_count,
       })),
     );
 
-    worksheet["!cols"] = [{ wch: 30 }, { wch: 20 }];
+    worksheet["!cols"] = [{ wch: 5 }, { wch: 100 }, { wch: 20 }];
+    for (let i = 1; i <= filteredData.length; i++) {
+      worksheet[`A${i + 1}`].s = {
+        alignment: { horizontal: "center" },
+        font: { name: "Times New Roman" },
+      };
+
+      worksheet[`B${i + 1}`].s = {
+        font: { name: "Times New Roman" },
+      };
+
+      worksheet[`C${i + 1}`].s = {
+        alignment: { horizontal: "center" },
+        font: { name: "Times New Roman" },
+      };
+    }
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-    XLSX.writeFile(workbook, "data.xlsx");
+    XLSX.writeFile(workbook, "ThongKeLGSP.xlsx");
   };
+
   useEffect(() => {
     onStartDateChange(startDate);
   }, [startDate, onStartDateChange]);
@@ -59,7 +77,7 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
       style={{ fontFamily: "'Roboto', sans-serif" }}
     >
       <div className="mb-6 flex flex-wrap items-center justify-between gap-6">
-        <div className="dark:bg-boxdark dark:text-gray-200 flex w-full flex-wrap items-center gap-6 sm:w-auto">
+        <div className="dark:text-gray-200 flex w-full flex-wrap items-center gap-6 dark:bg-boxdark sm:w-auto">
           <div className="flex-grow">
             <label className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium">
               Từ ngày
@@ -68,7 +86,7 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
               type="date"
               value={startDate}
               onChange={(e) => handleDateChange(e, setStartDate)}
-              className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input border-gray-400 dark:bg-boxdark dark:border-gray-600 dark:text-gray-300 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
+              className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
             />
           </div>
           <div className="flex-grow">
@@ -79,7 +97,7 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
               type="date"
               value={endDate}
               onChange={(e) => handleDateChange(e, setEndDate)}
-              className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input border-gray-400 dark:bg-boxdark dark:border-gray-600 dark:text-gray-300 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
+              className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
             />
           </div>
         </div>
@@ -93,10 +111,11 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
             value={searchTerm}
             onChange={handleSearchChange}
             placeholder="Nhập từ khóa..."
-            className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input border-gray-400 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-boxdark"
+            className="border-gray-400 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input"
           />
         </div>
-        <button style={{ alignSelf: "flex-end", backgroundColor: '#3C50E0' }}
+        <button
+          style={{ alignSelf: "flex-end", backgroundColor: "#3C50E0" }}
           onClick={exportToExcel}
           className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 dark:bg-meta-4"
         >
@@ -104,33 +123,49 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
         </button>
       </div>
       <div className="mt-6">
-        <table className="mb-10 min-w-full table-auto ">
+        <table className="mb-10 min-w-full table-auto">
           <thead style={{ backgroundColor: "#f3f4f6", borderRadius: 5 }}>
             <tr className="bg-gray-200 text-gray-600 border-gray-300 text-sm uppercase leading-normal">
-              <th className="px-6 py-3 text-left text-sm font-medium uppercase xsm:text-base dark:bg-meta-4">
+              <th className="w-[70%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 Dịch vụ
               </th>
-              <th className="px-6 py-3 text-left text-sm font-medium uppercase xsm:text-base dark:bg-meta-4">
+              <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 Số lượng request
               </th>
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {filteredData.map((bucket) => (
-              <tr
-                className="border-gray-100 hover:bg-gray-100 fade-in"
-                key={bucket.key}
-              >
-                <td className="flex items-center whitespace-nowrap px-6 py-3 text-left">
-                  {bucket.key}
-                </td>
-                <td className="px-6 py-3 text-left">
-                  {bucket.doc_count.toLocaleString()}
-                </td>
-              </tr>
+            {filteredData.map((bucket, index) => (
+              <React.Fragment key={bucket.key}>
+                <tr
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                  className="hover:bg-gray-100 fade-in"
+                >
+                  <td
+                    style={{ alignItems: "center" }}
+                    className="flex items-center whitespace-normal px-6 py-3 text-left"
+                  >
+                    {getDatabaseDescription(bucket?.key)}
+                  </td>
+                  <td
+                    style={{ fontWeight: "bold" }}
+                    className="px-6 py-3 text-left"
+                  >
+                    {bucket.doc_count.toLocaleString()}
+                  </td>
+                </tr>
+                {index < filteredData.length - 1 && (
+                  <tr>
+                    <td colSpan="2">
+                      <hr className="my-2 border-t border-[#cccccc] dark:border-[#4c4c4c]" />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
+
         {filteredData.length == 0 && (
           <div className="mb-10 w-full" style={{ alignSelf: "center" }}>
             <a style={{ textAlign: "center", color: "gray" }}>
