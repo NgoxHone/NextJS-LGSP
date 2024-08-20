@@ -22,47 +22,47 @@ const data = {
       buckets: [
         {
           key: "HTTTNTW",
-          doc_count: 1778116,
+          doc_count: 0,
         },
         {
           key: "PHANANH_CAMAU",
-          doc_count: 39008,
+          doc_count: 0,
         },
         {
           key: "DVC_BTXH",
-          doc_count: 20350,
+          doc_count: 0,
         },
         {
           key: "CSDL_CCVC",
-          doc_count: 10755,
+          doc_count: 0,
         },
         {
           key: "VBQPPL",
-          doc_count: 10441,
+          doc_count: 0,
         },
         {
           key: "CSDL_DanCu",
-          doc_count: 7777,
+          doc_count: 0,
         },
         {
           key: "NongNghiepCaMau",
-          doc_count: 4678,
+          doc_count: 0,
         },
         {
           key: "DMDC",
-          doc_count: 1182,
+          doc_count: 0,
         },
         {
           key: "BHXH",
-          doc_count: 607,
+          doc_count: 0,
         },
         {
           key: "IOFFICE",
-          doc_count: 203,
+          doc_count: 0,
         },
         {
           key: "LLTP-VNeID",
-          doc_count: 109,
+          doc_count: 0,
         },
       ],
     },

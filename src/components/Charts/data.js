@@ -22,23 +22,23 @@ export const dataEx = {
       buckets: [
         {
           key: 12,
-          doc_count: 64412,
+          doc_count: 0,
         },
         {
           key: 13,
-          doc_count: 63742,
+          doc_count: 0,
         },
         {
           key: 14,
-          doc_count: 62975,
+          doc_count: 0,
         },
         {
           key: 15,
-          doc_count: 65881,
+          doc_count: 0,
         },
         {
           key: 18,
-          doc_count: 60145,
+          doc_count: 0,
         },
       ],
     },
@@ -69,35 +69,35 @@ export const data2 = {
       buckets: [
         {
           key: 1,
-          doc_count: 2134219,
+          doc_count: 0,
         },
         {
           key: 2,
-          doc_count: 1911578,
+          doc_count: 0,
         },
         {
           key: 3,
-          doc_count: 2241191,
+          doc_count: 0,
         },
         {
           key: 4,
-          doc_count: 2050900,
+          doc_count: 0,
         },
         {
           key: 5,
-          doc_count: 2497136,
+          doc_count: 0,
         },
         {
           key: 6,
-          doc_count: 2479978,
+          doc_count: 0,
         },
         {
           key: 7,
-          doc_count: 3406366,
+          doc_count: 0,
         },
         {
           key: 8,
-          doc_count: 1159480,
+          doc_count: 0,
         },
       ],
     },

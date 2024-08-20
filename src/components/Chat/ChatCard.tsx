@@ -95,7 +95,7 @@ const ChatCard = () => {
         </select> */}
       </div>
 
-      <div
+      {data.length > 0 ? <div
         style={{
           overflowY: "scroll",
           overflowX: "hidden",
@@ -138,7 +138,7 @@ const ChatCard = () => {
             </div>
           </div>
         ))}
-      </div>
+      </div> : <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}> <a style={{ textAlign: 'center', color: 'gray', fontStyle: 'italic', fontFamily: 'sans-serif' }}>Không tìm thấy dữ liệu</a></div>}
     </div>
   );
 };

@@ -88,6 +88,9 @@ const ECommerce = () => {
     fetchTotalAPIToday();
   }, []);
   function calculatePercentageChange(today, yesterday) {
+    if (!today) {
+      return
+    }
     return (
       (Math.round(((today - yesterday) / yesterday) * 10000) / 100).toFixed(2) +
       "%"
@@ -115,8 +118,8 @@ const ECommerce = () => {
         <CardDataStats
           title="Request"
           total={Total.toLocaleString("de-DE")}
-          rate="0.43%"
-          levelUp
+          // rate="0.43%"
+          // levelUp
         >
           <svg
             className="fill-primary dark:fill-white"
@@ -136,7 +139,9 @@ const ECommerce = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Dịch vụ" total={TotalAPI} rate="4.35%" levelUp>
+        <CardDataStats title="Dịch vụ" total={TotalAPI} 
+        // rate="4.35%" levelUp
+        >
           <svg
             className="fill-primary dark:fill-white"
             width="20"
@@ -180,7 +185,7 @@ const ECommerce = () => {
         </CardDataStats>
         <CardDataStats
           title="Request hôm nay"
-          total={TotalAPIToday?.today?.doc_count}
+          total={TotalAPIToday?.today?.doc_count || 0}
           rate={calculatePercentageChange(
             TotalAPIToday?.today?.doc_count,
             TotalAPIToday?.yesterday?.doc_count,
