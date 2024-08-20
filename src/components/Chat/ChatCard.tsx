@@ -8,7 +8,7 @@ import { bodyLog, dataOption } from "./body";
 import MultiSelect from "../FormElements/MultiSelect";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
 
-const ChatCard = () => {
+const ChatCard = ({ height }) => {
   const [optionData, setOptionData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("HTTTNTW");
   const [data, setData] = useState([]);
@@ -61,9 +61,10 @@ const ChatCard = () => {
   const handleSelectChange = (value: string) => {
     setSelectedOption(value);
   };
+  // useEffect(() => {}, [height]);
   return (
     <div
-      style={{ height: 800, borderRadius: 7 }}
+      style={{ borderRadius: 7, }}
       className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4"
     >
       <div className="mb-6 flex items-center justify-between px-7.5">
@@ -95,50 +96,73 @@ const ChatCard = () => {
         </select> */}
       </div>
 
-      {data.length > 0 ? <div
-        style={{
-          overflowY: "scroll",
-          overflowX: "hidden",
-          maxHeight: 680,
-          paddingBottom: 20,
-          scrollbarWidth: "thin" /* Firefox */,
-          // scrollbarColor: "#888 #333" /* Firefox */,
-        }}
-      >
-        {data?.hits?.hits?.map((chat, key) => (
-          <div
-            className={`flex items-center gap-5 px-7.5 py-3 transition-colors duration-200 `}
-            key={key}
-          >
-            <div className="flex flex-1 items-center justify-between">
-              <div>
-                <p style={{ color: "gray", fontWeight: "bold" }}>
-                  <span
-                    style={{ textAlign: "right", fontStyle: "italic" }}
-                    className="text-gray-200 dark:text-gray-400 text-sm"
-                  >
-                    {formatTimestampToDate(chat._source.date_created)}
-                  </span>
-                </p>
-                <h5 className="font-medium text-blue-600 dark:text-blue-400">
-                  {chat._source.api}
-                </h5>
+      {data?.hits?.hits?.length > 0 ? (
+        <div
+          style={{
+            overflowY: "scroll",
+            overflowX: "hidden",
+            // minHeight: "50vh",
+            height:"150vh",
+            paddingBottom: 20,
+            scrollbarWidth: "thin" /* Firefox */,
+            // scrollbarColor: "#888 #333" /* Firefox */,
+          }}
+        >
+          {data?.hits?.hits?.map((chat, key) => (
+            <div
+              className={`flex items-center gap-5 px-7.5 py-3 transition-colors duration-200 `}
+              key={key}
+            >
+              <div className="flex flex-1 items-center justify-between">
+                <div>
+                  <p style={{ color: "gray", fontWeight: "bold" }}>
+                    <span
+                      style={{ textAlign: "right", fontStyle: "italic" }}
+                      className="text-gray-200 dark:text-gray-400 text-sm"
+                    >
+                      {formatTimestampToDate(chat._source.date_created)}
+                    </span>
+                  </p>
+                  <h5 className="font-medium text-blue-600 dark:text-blue-400">
+                    {chat._source.api}
+                  </h5>
 
-                <p>
-                  <span className="text-gray-700 dark:text-gray-300 text-sm">
-                    {chat._source.full_request_path}
-                  </span>
-                </p>
-                <p>
-                  <span className="text-sm text-green-600 dark:text-green-400">
-                    {chat._source.application_name}
-                  </span>
-                </p>
+                  <p>
+                    <span className="text-gray-700 dark:text-gray-300 text-sm">
+                      {chat._source.full_request_path}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-sm text-green-600 dark:text-green-400">
+                      {chat._source.application_name}
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div> : <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}> <a style={{ textAlign: 'center', color: 'gray', fontStyle: 'italic', fontFamily: 'sans-serif' }}>Không tìm thấy dữ liệu</a></div>}
+          ))}
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {" "}
+          <a
+            style={{
+              textAlign: "center",
+              color: "gray",
+              fontStyle: "italic",
+              fontFamily: "sans-serif",
+            }}
+          >
+            Không tìm thấy dữ liệu
+          </a>
+        </div>
+      )}
     </div>
   );
 };

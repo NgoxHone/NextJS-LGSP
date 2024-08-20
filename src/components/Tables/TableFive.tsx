@@ -56,7 +56,7 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
   return (
     <div
       className="rounded-lg border border-stroke bg-white px-6 pb-4 pt-6 shadow-lg dark:border-strokedark dark:bg-boxdark sm:px-8 xl:pb-3"
-      style={{ fontFamily: "'Roboto', sans-serif", height: 800 }}
+      style={{ fontFamily: "'Roboto', sans-serif" }}
     >
       <div className="mb-6 flex flex-wrap items-center justify-between gap-6">
         <div className="dark:bg-boxdark dark:text-gray-200 flex w-full flex-wrap items-center gap-6 sm:w-auto">
@@ -68,7 +68,7 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
               type="date"
               value={startDate}
               onChange={(e) => handleDateChange(e, setStartDate)}
-              className="border-gray-400 dark:bg-boxdark dark:border-gray-600 dark:text-gray-300 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
+              className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input border-gray-400 dark:bg-boxdark dark:border-gray-600 dark:text-gray-300 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
             />
           </div>
           <div className="flex-grow">
@@ -79,7 +79,7 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
               type="date"
               value={endDate}
               onChange={(e) => handleDateChange(e, setEndDate)}
-              className="border-gray-400 dark:bg-boxdark dark:border-gray-600 dark:text-gray-300 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
+              className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input border-gray-400 dark:bg-boxdark dark:border-gray-600 dark:text-gray-300 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400"
             />
           </div>
         </div>
@@ -93,10 +93,10 @@ const Table = ({ data, onStartDateChange, onEndDateChange }) => {
             value={searchTerm}
             onChange={handleSearchChange}
             placeholder="Nhập từ khóa..."
-            className="border-gray-400 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-boxdark"
+            className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input border-gray-400 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-boxdark"
           />
         </div>
-        <button style={{alignSelf:"flex-end"}}
+        <button style={{ alignSelf: "flex-end", backgroundColor: '#3C50E0' }}
           onClick={exportToExcel}
           className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 dark:bg-meta-4"
         >

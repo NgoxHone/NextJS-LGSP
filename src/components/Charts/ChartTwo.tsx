@@ -114,7 +114,7 @@ const ChartTwo: React.FC = () => {
   );
   const series = [
     {
-      name: "Sales",
+      name: "Request",
       data: temp,
     },
   ];

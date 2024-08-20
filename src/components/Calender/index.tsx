@@ -271,67 +271,211 @@
 // };
 
 // export default Calendar;
-
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
-import Breadcrumb from "../Breadcrumbs/Breadcrumb";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import Modal from "../Modal/Modal"; // Import the Modal component
+import { dataByNgayTrongThang } from "../Dashboard/data"; // Import your data
+import ChartThree from "../Charts/ChartThree";
+import { fetchData } from "../../../utilities/GlobalFunction";
+import { bodyByDay, bodyByTungNgay } from "../Charts/body";
+import { dataExTungNgay } from "../Charts/data";
 
+function processCountByMonth(data) {
+  const top5Items = data.aggregations.count_by_month.buckets.slice(0, 5);
+  const otherItemsTotal = data.aggregations.count_by_month.buckets
+    .slice(5)
+    .reduce((sum, item) => sum + item.doc_count, 0);
+  const result = [
+    ...top5Items,
+    { key: "Những dịch vụ khác", doc_count: otherItemsTotal },
+  ];
+  return result;
+}
+const vietnameseMonths = [
+  "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+  "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+];
 const Calendar = () => {
   const [days, setDays] = useState([]);
   const [startDay, setStartDay] = useState(0);
+  const [docCounts, setDocCounts] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [dataTungNgay, setDataTungNgay] = useState(dataExTungNgay);
+  const [data, setData] = useState(dataByNgayTrongThang);
+  const [loading, setLoading] = useState(false);
+  const fetchDocuments = () => {
+    setLoading(true);
+    fetchData(bodyByDay([selectedMonth + 1], selectedYear), setData).finally(
+      () => setLoading(false),
+    );
+  };
+  const fetchDocumentsTungNgay = () => {
+    console.log(
+      bodyByTungNgay([selectedDate], [selectedMonth + 1], selectedYear),
+    );
+    setLoading(true);
+    fetchData(
+      bodyByTungNgay([selectedDate], [selectedMonth + 1], selectedYear),
+      setDataTungNgay,
+    ).finally(() => setLoading(false));
+  };
+  console.log("===>", processCountByMonth(dataTungNgay));
+  useEffect(() => fetchDocuments(), [selectedMonth, selectedYear]);
+  useEffect(
+    () => fetchDocumentsTungNgay(),
+    [selectedMonth, selectedYear, selectedDate],
+  );
 
+  const temp = data?.aggregations?.count_by_day?.buckets?.map(
+    (bucket) => bucket.doc_count,
+  );
   useEffect(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth(); // January is 0!
-
-    // Get the first day of the month
-    const firstDay = new Date(year, month, 1);
-    // Adjust so Monday is 0, Tuesday is 1, ..., Sunday is 6
+    // Calculate the start day of the month
+    const firstDay = startOfMonth(new Date(selectedYear, selectedMonth));
     const adjustedStartDay = (firstDay.getDay() + 6) % 7;
     setStartDay(adjustedStartDay);
 
-    // Get the number of days in the month
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    // Calculate the days of the month
+    const lastDay = endOfMonth(firstDay);
+    const daysArray = eachDayOfInterval({
+      start: firstDay,
+      end: lastDay,
+    }).map((day) => day.getDate());
     setDays(daysArray);
-  }, []);
-  // console.log(days)
+
+    const counts = data?.aggregations?.count_by_day?.buckets?.reduce(
+      (acc, item) => {
+        acc[item.key] = item.doc_count;
+        return acc;
+      },
+      {},
+    );
+    setDocCounts(counts);
+  }, [selectedYear, selectedMonth, data]);
+  console.log(docCounts);
+  const handleYearChange = (event) => {
+    setSelectedYear(Number(event.target.value));
+    // setSelectedDate(new Date(Number(event.target.value), selectedMonth));
+  };
+
+  const handleMonthChange = (event) => {
+    setSelectedMonth(Number(event.target.value));
+    // setSelectedDate(new Date(selectedYear, Number(event.target.value)));
+  };
+
+  const years = Array.from(
+    { length: 20 },
+    (_, i) => new Date().getFullYear() - 10 + i,
+  );
+  const months = Array.from({ length: 12 }, (_, i) => i);
+
   return (
-    <div className="mx-auto max-w-7xl">
-      <Breadcrumb pageName="Calendar" />
-      <div className="w-full max-w-full rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <table className="w-full">
-          <thead>
-            <tr className="grid grid-cols-7 rounded-t-sm bg-primary text-white">
-              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                <th key={day} className="flex h-15 items-center justify-center rounded-tl-sm p-1 text-xs font-semibold sm:text-base xl:p-5">
-                  <span className="block lg:block">{day}</span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {/* Render days using map */}
-            {Array.from({ length: Math.ceil((days.length + startDay) / 7) }).map((_, weekIndex) => (
-              <tr key={weekIndex} className="grid grid-cols-7">
-                {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  const day = weekIndex * 7 + dayIndex - startDay + 1;
-                  return (
-                    <td key={dayIndex} className="ease relative h-20 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-25 md:p-6 xl:h-31">
-                      {day > 0 && day <= days.length ? (
-                        <span className="font-medium text-black dark:text-white">{day}</span>
-                      ) : (
-                        <span className="text-transparent">0</span>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="mx-auto rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      {/* Month and Year Selectors */}
+      <div className="flex gap-4 p-4">
+        <select
+          value={selectedMonth}
+          onChange={handleMonthChange}
+          className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
+        >
+          {months.map((month) => (
+            <option key={month} value={month}>
+              {vietnameseMonths[month]}
+            </option>
+          ))}
+        </select>
+        <select
+          value={selectedYear}
+          onChange={handleYearChange}
+          className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
+        >
+          {years.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
       </div>
+      <table className="w-full">
+        <thead>
+          <tr className="grid grid-cols-7 rounded-t-sm bg-primary text-white">
+            {[
+              "Thứ Hai",
+              "Thứ Ba",
+              "Thứ Tư",
+              "Thứ Năm",
+              "Thứ Sáu",
+              "Thứ Bảy",
+              "Chủ Nhật",
+            ].map((day) => (
+              <th
+                key={day}
+                className="flex h-15 items-center justify-center rounded-tl-sm p-1 text-xs font-semibold sm:text-sm xl:p-5"
+              >
+                <span className="block lg:block">{day}</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({
+            length: Math.ceil((days.length + startDay) / 7),
+          }).map((_, weekIndex) => (
+            <tr key={weekIndex} className="grid grid-cols-7">
+              {Array.from({ length: 7 }).map((_, dayIndex) => {
+                const day = weekIndex * 7 + dayIndex - startDay + 1;
+                return (
+                  <td
+                    onClick={() => {
+                      if (docCounts[day])
+                        setTimeout(() => {
+                          setShowModal(true);
+                        }, 300);
+                      setSelectedDate(day);
+                    }}
+                    key={dayIndex}
+                    className="ease relative h-20 cursor-pointer border border-stroke p-2 transition duration-500 hover:bg-gray dark:border-strokedark dark:hover:bg-meta-4 md:h-25 md:p-6 xl:h-31"
+                  >
+                    {day > 0 && day <= days.length ? (
+                      <div>
+                        <a
+                          // href="#"
+                          className="font-medium text-black dark:text-white sm:text-sm"
+                        >
+                          {day}
+                        </a>
+                        <p className="text-gray-600 mt-2 text-sm sm:text-sm">
+                          {docCounts[day]}
+                        </p>
+                      </div>
+                    ) : (
+                      <span className="text-transparent">0</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {showModal && (
+        <Modal showModal={showModal} setShowModal={setShowModal}>
+          <ChartThree
+            data={processCountByMonth(dataTungNgay)}
+            title={
+              selectedDate.toString() +
+              "/" +
+              (selectedMonth + 1).toString() +
+              "/" +
+              selectedYear.toString()
+            }
+          />
+        </Modal>
+      )}
     </div>
   );
 };

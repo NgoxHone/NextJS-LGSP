@@ -103,3 +103,19 @@ export const data2 = {
     },
   },
 };
+
+export const dataExTungNgay = {
+  aggregations: {
+    count_by_month: {
+      buckets: [
+        { key: "HTTTNTW", doc_count: 57922 },
+        { key: "PHANANH_CAMAU", doc_count: 1634 },
+        { key: "DVC_BTXH", doc_count: 1020 },
+        { key: "CSDL_CCVC", doc_count: 746 },
+        { key: "CSDL_DanCu", doc_count: 299 },
+        { key: "NongNghiepCaMau", doc_count: 192 },
+        { key: "DKKD", doc_count: 13 },
+      ],
+    },
+  },
+};
