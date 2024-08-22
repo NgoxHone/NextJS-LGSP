@@ -1,16 +1,71 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-
-export const metadata: Metadata = {
-  title: "Thống kê request LGSP",
-  description: "This is Next.js Signin Page TailAdmin Dashboard Template",
-};
+import { CONFIG } from "../config";
+import { useRecoilState } from 'recoil';
+import { accessTokenState, idTokenState, expiresAtState } from '../../../../utilities/Atom/atom'; 
 
 const SignIn: React.FC = () => {
+  const [accessToken, setAccessToken] = useRecoilState(accessTokenState);
+  const [idToken, setIdToken] = useRecoilState(idTokenState);
+  const [expiresAt, setExpiresAt] = useRecoilState(expiresAtState);
+
+  console.log(accessToken)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const sessionState = urlParams.get('session_state');
+
+      if (code) {
+        fetchTokens(code);
+      }
+    }
+  }, []);
+
+  const fetchTokens = async (code: string) => {
+    try {
+      const response = await fetch(`${CONFIG.TOKEN_ENDPOINT}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: CONFIG.REDIRECT_URI,
+          client_id: CONFIG.CLIENT_ID,
+          client_secret: CONFIG.CLIENT_SECRET,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.access_token) {
+        setAccessToken(data.access_token);
+        setIdToken(data.id_token);
+        setExpiresAt(Date.now() + data.expires_in * 1000);
+
+        // Bạn cũng có thể lưu trữ vào localStorage nếu muốn
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('idToken', data.id_token);
+        localStorage.setItem('expiresAt', (Date.now() + data.expires_in * 1000).toString());
+      }
+    } catch (error) {
+      console.error('Error fetching tokens:', error);
+    }
+  };
+
+  const Login = () => {
+    let authorizeRequest = `${CONFIG.AUTHORIZE_ENDPOINT}?response_type=${CONFIG.RESPONSE_TYPE}&scope=${CONFIG.SCOPE}&redirect_uri=${CONFIG.REDIRECT_URI}&client_id=${CONFIG.CLIENT_ID}`;
+    console.log(authorizeRequest);
+    window.location.href = authorizeRequest;
+  };
+  console.log("Code", code);
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Sign In" />
@@ -169,8 +224,11 @@ const SignIn: React.FC = () => {
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
             <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
               {/* <span className="mb-1.5 block font-medium">Start for free</span> */}
-              <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                Sign In to TailAdmin
+              <h2
+                style={{ fontFamily: "sans-serif" }}
+                className="sans-serif mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2"
+              >
+                Đăng nhập để xem thống kê
               </h2>
 
               <form>
@@ -240,13 +298,13 @@ const SignIn: React.FC = () => {
                   </div>
                 </div> */}
 
-                <div className="mb-5">
-                  <input
-                    type="submit"
-                    value="Sign In"
-                    className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={Login}
+                  className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                >
+                  Đăng nhập SSO
+                </button>
 
                 {/* <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
                   <span>
