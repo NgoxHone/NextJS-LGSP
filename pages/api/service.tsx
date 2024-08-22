@@ -1,5 +1,10 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+interface ElasticsearchErrorResponse {
+  message: string;
+  status?: number;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { index, body } = req.body;
@@ -9,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const response = await axios({
-      method: 'get',  // Thường là POST khi bạn gửi dữ liệu trong body
+      method: 'post',  // Sử dụng POST khi bạn gửi dữ liệu trong body
       url: url,
       headers: {
         'Content-Type': 'application/json'
@@ -21,13 +26,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Elasticsearch Axios Error:", error);
-    // Gửi phản hồi lỗi
-    if (error.response) {
-      res.status(error.response.status).json(error.response.data);
-    } else if (error.request) {
-      res.status(500).json({ message: "No response received from Elasticsearch" });
+
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+
+      // Gửi phản hồi lỗi với thông tin chi tiết từ axios
+      if (axiosError.response) {
+        res.status(axiosError.response.status).json(axiosError.response.data);
+      } else if (axiosError.request) {
+        res.status(500).json({ message: "No response received from Elasticsearch" });
+      } else {
+        res.status(500).json({ message: "Error setting up Elasticsearch request" });
+      }
     } else {
-      res.status(500).json({ message: "Error setting up Elasticsearch request" });
+      // Xử lý các loại lỗi khác không phải do axios
+      res.status(500).json({ message: "Unexpected error occurred" });
     }
   }
 }

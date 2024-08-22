@@ -1,4 +1,5 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export const getTimestampRanges = () => {
   // Lấy thời điểm hiện tại
@@ -129,5 +130,12 @@ export function getDatabaseDescription(id) {
   }
 }
 
-// Ví dụ sử dụng
-console.log(getDatabaseDescription(1)); // Output: "Hệ thống định danh và xác thực điện tử (Bộ Công an)"
+export const decodeJWT = () => {
+  try {
+    const decoded = jwtDecode(token);
+    return decoded;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};

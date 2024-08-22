@@ -1,5 +1,5 @@
 export const CONFIG = {
-  // "TOKEN_ENDPOINT": "https://idp.cqdtcamau.vn/oauth2/token",
+  TOKEN_ENDPOINT: "https://idp.cqdtcamau.vn/oauth2/token",
   AUTHORIZE_ENDPOINT: "https://idp.cqdtcamau.vn/oauth2/authorize",
   RESPONSE_TYPE: "code",
   SCOPE: "openid",

@@ -2,12 +2,36 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
+import Cookies from "js-cookie";
+import { useRecoilState } from "recoil";
+import {
+  accessTokenState,
+  expiresAtState,
+  idTokenState,
+} from "../../../utilities/Atom/atom";
+import { CONFIG } from "@/app/auth/config";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [accessToken, setAccessToken] = useRecoilState(accessTokenState);
+  const [idToken, setIdToken] = useRecoilState(idTokenState);
+  const [expiresAt, setExpiresAt] = useRecoilState(expiresAtState);
+  const Logout = () => {
+    if (typeof window !== "undefined") {
+      Cookies.remove("accessToken");
+      Cookies.remove("idToken");
+      Cookies.remove("expiresAt");
+      setAccessToken("");
+      setIdToken("");
+      setExpiresAt(0);
+
+      const logoutUrl = `${CONFIG.LOGOUT_URL}?post_logout_redirect_uri=${CONFIG.REDIRECT_URI}&id_token_hint=${idToken}`;
+      window.location.href = logoutUrl;
+    }
+  };
 
   return (
-    <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
+    <ClickOutside onClick={() => setDropdownOpen(true)} className="relative">
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center gap-4"
@@ -22,6 +46,7 @@ const DropdownUser = () => {
 
         <span className="h-12 w-12 rounded-full">
           <Image
+            // onClick={() => setDropdownOpen(!dropdownOpen)}
             width={112}
             height={112}
             src={"/images/user/user-01.jpg"}
@@ -51,11 +76,11 @@ const DropdownUser = () => {
       </Link>
 
       {/* <!-- Dropdown Start --> */}
-      {/* {dropdownOpen && (
+      {dropdownOpen && (
         <div
           className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
         >
-          <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
+          {/* <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
               <Link
                 href="/profile"
@@ -127,8 +152,15 @@ const DropdownUser = () => {
                 Account Settings
               </Link>
             </li>
-          </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          </ul> */}
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                Logout();
+              }
+            }}
+            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+          >
             <svg
               className="fill-current"
               width="22"
@@ -149,7 +181,7 @@ const DropdownUser = () => {
             Log Out
           </button>
         </div>
-      )} */}
+      )}
       {/* <!-- Dropdown End --> */}
     </ClickOutside>
   );

@@ -1,76 +1,129 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { CONFIG } from "../config";
-import { useRecoilState } from 'recoil';
-import { accessTokenState, idTokenState, expiresAtState } from '../../../../utilities/Atom/atom'; 
-
+import { useRecoilState } from "recoil";
+import Cookies from "js-cookie";
+import {
+  accessTokenState,
+  idTokenState,
+  expiresAtState,
+} from "../../../../utilities/Atom/atom";
 const SignIn: React.FC = () => {
+  React.useEffect(() => {
+    import("@lottiefiles/lottie-player");
+  });
   const [accessToken, setAccessToken] = useRecoilState(accessTokenState);
   const [idToken, setIdToken] = useRecoilState(idTokenState);
   const [expiresAt, setExpiresAt] = useRecoilState(expiresAtState);
+  const ref = useRef<HTMLDivElement>(null);
 
-  console.log(accessToken)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const sessionState = urlParams.get('session_state');
+    // Function to fetch tokens
+    const fetchTokens = async (code: string) => {
+      try {
+        const response = await fetch(`${CONFIG.TOKEN_ENDPOINT}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            grant_type: "authorization_code",
+            code: code,
+            redirect_uri: CONFIG.REDIRECT_URI,
+            client_id: CONFIG.CLIENT_ID,
+            client_secret: CONFIG.CLIENT_SECRET,
+          }),
+        });
 
-      if (code) {
-        fetchTokens(code);
+        const data = await response.json();
+
+        if (data.access_token) {
+          const expiresAtTimestamp = Date.now() + data.expires_in * 1000;
+          setAccessToken(data.access_token);
+          setIdToken(data.id_token);
+          setExpiresAt(expiresAtTimestamp);
+          Cookies.set("accessToken", data.access_token, {
+            expires: data.expires_in / 86400,
+          });
+          Cookies.set("idToken", data.id_token, {
+            expires: data.expires_in / 86400,
+          });
+          Cookies.set("expiresAt", expiresAtTimestamp.toString(), {
+            expires: data.expires_in / 86400,
+          });
+          if (typeof window !== "undefined") {
+            window.history.replaceState(
+              {},
+              document.title,
+              window.location.pathname,
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching tokens:", error);
       }
-    }
+    };
+
+    // Check for existing tokens or fetch new ones
+    const checkTokens = () => {
+      const storedAccessToken = Cookies.get("accessToken");
+      const storedIdToken = Cookies.get("idToken");
+      const storedExpiresAt = Cookies.get("expiresAt");
+
+      if (
+        storedAccessToken &&
+        storedIdToken &&
+        storedExpiresAt &&
+        Date.now() < Number(storedExpiresAt)
+      ) {
+        setAccessToken(storedAccessToken);
+        setIdToken(storedIdToken);
+        setExpiresAt(Number(storedExpiresAt));
+      } else {
+        if (typeof window !== "undefined") {
+          const urlParams = new URLSearchParams(window.location.search);
+          const code = urlParams.get("code");
+          if (code) {
+            fetchTokens(code);
+          }
+        }
+      }
+    };
+
+    checkTokens();
   }, []);
 
-  const fetchTokens = async (code: string) => {
-    try {
-      const response = await fetch(`${CONFIG.TOKEN_ENDPOINT}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: CONFIG.REDIRECT_URI,
-          client_id: CONFIG.CLIENT_ID,
-          client_secret: CONFIG.CLIENT_SECRET,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.access_token) {
-        setAccessToken(data.access_token);
-        setIdToken(data.id_token);
-        setExpiresAt(Date.now() + data.expires_in * 1000);
-
-        // Bạn cũng có thể lưu trữ vào localStorage nếu muốn
-        localStorage.setItem('accessToken', data.access_token);
-        localStorage.setItem('idToken', data.id_token);
-        localStorage.setItem('expiresAt', (Date.now() + data.expires_in * 1000).toString());
-      }
-    } catch (error) {
-      console.error('Error fetching tokens:', error);
+  const Login = () => {
+    if (typeof window !== "undefined") {
+      const authorizeRequest = `${CONFIG.AUTHORIZE_ENDPOINT}?response_type=${CONFIG.RESPONSE_TYPE}&scope=${CONFIG.SCOPE}&redirect_uri=${CONFIG.REDIRECT_URI}&client_id=${CONFIG.CLIENT_ID}`;
+      window.location.href = authorizeRequest;
     }
   };
 
-  const Login = () => {
-    let authorizeRequest = `${CONFIG.AUTHORIZE_ENDPOINT}?response_type=${CONFIG.RESPONSE_TYPE}&scope=${CONFIG.SCOPE}&redirect_uri=${CONFIG.REDIRECT_URI}&client_id=${CONFIG.CLIENT_ID}`;
-    console.log(authorizeRequest);
-    window.location.href = authorizeRequest;
+  const Logout = () => {
+    if (typeof window !== "undefined") {
+      Cookies.remove("accessToken");
+      Cookies.remove("idToken");
+      Cookies.remove("expiresAt");
+      setAccessToken("");
+      setIdToken("");
+      setExpiresAt(0);
+
+      const logoutUrl = `${CONFIG.LOGOUT_URL}?post_logout_redirect_uri=${CONFIG.REDIRECT_URI}&id_token_hint=${idToken}`;
+      window.location.href = logoutUrl;
+    }
   };
-  console.log("Code", code);
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Sign In" />
 
-      <div className="h-full rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="h-full rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="px-26 py-17.5 text-center">
@@ -223,13 +276,26 @@ const SignIn: React.FC = () => {
 
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
             <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
+              <div className="flex h-full items-center justify-center">
+                <lottie-player
+                  id="firstLottie"
+                  ref={ref}
+                  autoplay
+                  loop
+                  mode="normal"
+                  src="https://lottie.host/09f9ba78-6308-46b2-92fd-b2316916b03a/ELxCNyPSRJ.json"
+                  className="w-4/5 md:w-1/5"
+                ></lottie-player>
+              </div>
+
               {/* <span className="mb-1.5 block font-medium">Start for free</span> */}
-              <h2
+              {/* <h2
                 style={{ fontFamily: "sans-serif" }}
                 className="sans-serif mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2"
               >
                 Đăng nhập để xem thống kê
-              </h2>
+              </h2> */}
+              {/* <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script> */}
 
               <form>
                 {/* <div className="mb-4">
@@ -298,13 +364,33 @@ const SignIn: React.FC = () => {
                   </div>
                 </div> */}
 
-                <button
-                  type="button"
-                  onClick={Login}
-                  className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-                >
-                  Đăng nhập SSO
-                </button>
+                {!accessToken ? (
+                  <button
+                    style={{ fontFamily: "sans-serif" }}
+                    type="button"
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        Login();
+                      }
+                    }}
+                    className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                  >
+                    Đăng nhập SSO
+                  </button>
+                ) : (
+                  <button
+                    style={{ fontFamily: "sans-serif", fontWeight: "bold" }}
+                    type="button"
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        Logout();
+                      }
+                    }}
+                    className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50"
+                  >
+                    Đăng xuất
+                  </button>
+                )}
 
                 {/* <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
                   <span>
