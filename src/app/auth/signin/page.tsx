@@ -15,7 +15,7 @@ const SignIn: React.FC = () => {
     <DefaultLayout>
       <Breadcrumb pageName="Sign In" />
 
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="h-full rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="px-26 py-17.5 text-center">
@@ -168,13 +168,13 @@ const SignIn: React.FC = () => {
 
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
             <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-              <span className="mb-1.5 block font-medium">Start for free</span>
+              {/* <span className="mb-1.5 block font-medium">Start for free</span> */}
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Sign In to TailAdmin
               </h2>
 
               <form>
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
                   </label>
@@ -203,9 +203,9 @@ const SignIn: React.FC = () => {
                       </svg>
                     </span>
                   </div>
-                </div>
+                </div> */}
 
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Password
                   </label>
@@ -238,7 +238,7 @@ const SignIn: React.FC = () => {
                       </svg>
                     </span>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="mb-5">
                   <input
@@ -248,7 +248,7 @@ const SignIn: React.FC = () => {
                   />
                 </div>
 
-                <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+                {/* <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
                   <span>
                     <svg
                       width="20"
@@ -283,16 +283,16 @@ const SignIn: React.FC = () => {
                     </svg>
                   </span>
                   Sign in with Google
-                </button>
+                </button> */}
 
-                <div className="mt-6 text-center">
+                {/* <div className="mt-6 text-center">
                   <p>
                     Don’t have any account?{" "}
                     <Link href="/auth/signup" className="text-primary">
                       Sign Up
                     </Link>
                   </p>
-                </div>
+                </div> */}
               </form>
             </div>
           </div>
