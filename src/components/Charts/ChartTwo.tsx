@@ -82,15 +82,21 @@ function getDatesOfCurrentWeek() {
   const endOfWeek = startOfWeek + 6; // Ngày chủ nhật của tuần hiện tại
 
   const dates = [];
+  const currentMonth = today.getMonth(); // Lưu trữ tháng hiện tại
+
   for (let i = startOfWeek; i <= endOfWeek; i++) {
-    const date = new Date(today.setDate(i));
-    // Reset lại ngày để tránh ảnh hưởng từ vòng lặp
-    today.setDate(today.getDate() - (i - startOfWeek));
-    dates.push(date.getDate());
+    const date = new Date(today);
+    date.setDate(i);
+
+    // Kiểm tra nếu ngày nằm trong tháng hiện tại
+    if (date.getMonth() === currentMonth) {
+      dates.push(date.getDate());
+    }
   }
 
   return dates;
 }
+
 function getCurrentMonth() {
   const today = new Date();
   const month = today.getMonth(); // Tháng hiện tại (0 - 11)
@@ -108,6 +114,7 @@ const ChartTwo: React.FC = () => {
       setData,
     ).finally(() => setLoading(false));
   };
+  console.log(bodyByWeek(getDatesOfCurrentWeek(), [getCurrentMonth()]));
   useEffect(() => fetchDocuments(), []);
   const temp = data.aggregations.count_by_day.buckets.map(
     (bucket) => bucket.doc_count,

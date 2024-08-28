@@ -1,4 +1,4 @@
-export function bodyByYear(y = 2024) {
+export function bodyByYear(y = 2024, api = "HTTTNTW") {
   return {
     index: "apim-request-index/_search",
     body: {
@@ -11,17 +11,48 @@ export function bodyByYear(y = 2024) {
                 nam: y,
               },
             },
+            {
+              term: {
+                am_key_type: "PRODUCTION",
+              },
+            },
+            {
+              term: {
+                api: api,
+              },
+            },
+            {
+              exists: {
+                field: "api",
+              },
+            },
           ],
         },
       },
       aggs: {
-        count_by_month: {
+        by_api: {
           terms: {
-            field: "thang",
-            order: {
-              _key: "asc", // Sắp xếp theo key (tháng) tăng dần
+            field: "api",
+            size: 10,
+          },
+          aggs: {
+            count_by_month: {
+              terms: {
+                field: "thang",
+                order: {
+                  _key: "asc",
+                },
+                size: 12,
+              },
+              aggs: {
+                by_application_name: {
+                  terms: {
+                    field: "application_name",
+                    size: 50,
+                  },
+                },
+              },
             },
-            size: 12, // Đảm bảo lấy tất cả 12 tháng
           },
         },
       },

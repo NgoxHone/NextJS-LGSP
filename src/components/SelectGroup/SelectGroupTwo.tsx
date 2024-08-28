@@ -19,14 +19,14 @@ const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({ label, options, onSelec
 
   return (
     <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+      <label className="block text-sm font-medium text-black dark:text-white">
         {label}
       </label>
       <div className="relative z-20 bg-white dark:bg-form-input">
         <select
           value={selectedOption}
           onChange={handleChange}
-          className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
+          className={`relative h-15 z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
         >
           <option value="" disabled>
             {label}

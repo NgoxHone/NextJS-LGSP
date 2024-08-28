@@ -1,20 +1,24 @@
+"use client"
 import Chart from "@/components/Charts/page";
-import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import React from "react";
-
-export const metadata: Metadata = {
-  title: "Thống kê request LGSP",
-  description:
-    "This is Next.js Chart page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template",
-};
-
+import { useRecoilState } from "recoil";
+import { accessTokenState } from "../../../utilities/Atom/atom";
+import dynamic from "next/dynamic";
+const SignIn = dynamic(() => import("../auth/signin/page"), { ssr: false });
+const DefaultLayout = dynamic(
+  () => import("@/components/Layouts/DefaultLayout"),
+  { ssr: false },
+);
 const BasicChartPage: React.FC = () => {
-  return (
-    <DefaultLayout>
-      <Chart />
-    </DefaultLayout>
-  );
-};
-
+  const [accessToken] = useRecoilState(accessTokenState);
+  return (<>
+    {!accessToken ? (
+      <SignIn />
+    ) : (
+      <DefaultLayout>
+        <Chart />
+      </DefaultLayout>
+    )}
+  </>);
+}
 export default BasicChartPage;

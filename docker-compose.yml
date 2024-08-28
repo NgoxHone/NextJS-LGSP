@@ -1,0 +1,16 @@
+version: "3.8"  # Sử dụng phiên bản 3.8 để tận dụng các tính năng mới và cải thiện
+
+services:
+  thongkelgsp:
+    image: thongkelgsp  # Sử dụng image này nếu đã được build sẵn, nếu không Docker sẽ build từ Dockerfile
+    restart: unless-stopped
+    build:  # Docker Compose sẽ build image nếu chưa có sẵn
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"  # Chuyển tiếp cổng 3001 của máy chủ đến cổng 3000 của container
+    environment:
+      - NODE_ENV=production  # Định nghĩa môi trường để đảm bảo ứng dụng chạy đúng cấu hình
+      - PORT=3000  # Đảm bảo ứng dụng trong container lắng nghe trên cổng 3000
+    network_mode: "host"
+

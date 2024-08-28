@@ -367,10 +367,8 @@ const Calendar = () => {
     // setSelectedDate(new Date(selectedYear, Number(event.target.value)));
   };
 
-  const years = Array.from(
-    { length: 20 },
-    (_, i) => new Date().getFullYear() - 10 + i,
-  );
+  const years = Array.from({ length: 5 }, (_, i) => 2023 + i);
+
   const months = Array.from({ length: 12 }, (_, i) => i);
 
   return (

@@ -29,17 +29,17 @@ const SignUp: React.FC = () => {
                   width={176}
                   height={32}
                 />
-                <Image
+                {/* <Image
                   className="dark:hidden"
                   src={"/images/logo/logo-dark.svg"}
                   alt="Logo"
                   width={176}
                   height={32}
-                />
+                /> */}
               </Link>
               <p className="2xl:px-20">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                suspendisse.
+                {/* Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                suspendisse. */}
               </p>
 
               <span className="mt-15 inline-block">

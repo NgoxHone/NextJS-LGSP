@@ -1,4 +1,4 @@
-export function data1(start,end) {
+export function data1(start, end) {
   return {
     index: "apim-request-index/_search",
     body: {
@@ -112,3 +112,50 @@ export function TotalToday(today, yesterday) {
     },
   };
 }
+
+export const bodySendEdoc = (start, end) => {
+  return {
+    index: "apim-request-index/_count",
+    body: {
+      query: {
+        bool: {
+          must: [
+            {
+              range: {
+                date_created: {
+                  gt: start,
+                  lt: end,
+                },
+              },
+            },
+            { match: { full_request_path: "/vdxp-product/1.0/sendEdoc" } },
+            { wildcard: { headers: "*=edoc*" } },
+          ],
+        },
+      },
+    },
+  };
+};
+
+export const bodyGetEdoc = (start, end) => {
+  return {
+    index: "apim-request-index/_count",
+    body: {
+      query: {
+        bool: {
+          must: [
+            {
+              range: {
+                date_created: {
+                  gt: start,
+                  lt: end,
+                },
+              },
+            },
+            { match: { full_request_path: "/vdxp-product/1.0/getEdoc" } },
+          ],
+        },
+      },
+    },
+  };
+};

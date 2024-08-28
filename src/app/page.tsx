@@ -1,5 +1,5 @@
 "use client";
-import ECommerce from "@/components/Dashboard/E-commerce";
+// import ECommerce from "@/components/Dashboard/E-commerce";
 import { Metadata } from "next";
 // import DefaultLayout from "@/components/Layouts/DefaultLayout";
 // import SignIn from "./auth/signin/page";
@@ -15,19 +15,21 @@ const DefaultLayout = dynamic(
   () => import("@/components/Layouts/DefaultLayout"),
   { ssr: false },
 );
+const ECommerce = dynamic(() => import("@/components/Dashboard/E-commerce"), {
+  ssr: true,
+});
 export default function Home() {
   const [accessToken] = useRecoilState(accessTokenState);
 
   return (
     <>
-      {/* {accessToken ? (
-    
-      ) : ( */}
+      {!accessToken ? (
         <SignIn />
-        {/* <DefaultLayout> */}
+      ) : (
+        <DefaultLayout>
           <ECommerce />
-        {/* </DefaultLayout> */}
-      {/* )} */}
+        </DefaultLayout>
+      )}
     </>
   );
 }

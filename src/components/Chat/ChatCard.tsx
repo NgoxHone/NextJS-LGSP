@@ -7,9 +7,11 @@ import axios from "axios";
 import { bodyLog, dataOption } from "./body";
 import MultiSelect from "../FormElements/MultiSelect";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
+import { useRecoilState } from "recoil";
+import { optionService } from "../../../utilities/Atom/atom";
 
 const ChatCard = ({ height }) => {
-  const [optionData, setOptionData] = useState(null);
+  const [optionData, setOptionData] = useRecoilState(optionService);
   const [selectedOption, setSelectedOption] = useState("HTTTNTW");
   const [data, setData] = useState([]);
   // console.log(bodyLog("aa"))

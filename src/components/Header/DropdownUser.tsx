@@ -10,6 +10,7 @@ import {
   idTokenState,
 } from "../../../utilities/Atom/atom";
 import { CONFIG } from "@/app/auth/config";
+import { jwtDecode } from "jwt-decode";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -29,36 +30,40 @@ const DropdownUser = () => {
       window.location.href = logoutUrl;
     }
   };
-
+  // console.log(accessToken)
+  // const decodedToken = jwtDecode(idToken);
+  // console.log(decodedToken)
+  // const username = decodedToken?.sub || "Admin";
   return (
-    <ClickOutside onClick={() => setDropdownOpen(true)} className="relative">
-      <Link
-        onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-4"
-        href="#"
-      >
-        <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black dark:text-white">
-            Admin
+    <ClickOutside className="relative">
+      {accessToken && (
+        <Link
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="flex items-center gap-4"
+          href="#"
+        >
+          <span className="hidden text-right lg:block">
+            {idToken != null && <span className="block text-sm font-medium text-black dark:text-white">
+              {jwtDecode(idToken)?.sub || "Admin"}
+            </span>}
+            <span className="block text-xs">admin</span>
           </span>
-          <span className="block text-xs">admin</span>
-        </span>
 
-        <span className="h-12 w-12 rounded-full">
-          <Image
-            // onClick={() => setDropdownOpen(!dropdownOpen)}
-            width={112}
-            height={112}
-            src={"/images/user/user-01.jpg"}
-            style={{
-              width: "auto",
-              height: "auto",
-            }}
-            alt="User"
-          />
-        </span>
+          <span className="h-12 w-12 rounded-full">
+            <Image
+              // onClick={() => setDropdownOpen(!dropdownOpen)}
+              width={112}
+              height={112}
+              src={"/images/user/user-01.jpg"}
+              style={{
+                width: "auto",
+                height: "auto",
+              }}
+              alt="User"
+            />
+          </span>
 
-        {/* <svg
+          {/* <svg
           className="hidden fill-current sm:block"
           width="12"
           height="8"
@@ -73,7 +78,8 @@ const DropdownUser = () => {
             fill=""
           />
         </svg> */}
-      </Link>
+        </Link>
+      )}
 
       {/* <!-- Dropdown Start --> */}
       {dropdownOpen && (

@@ -7,10 +7,14 @@ export const accessTokenState = atom<string | null>({
 
 export const idTokenState = atom<string | null>({
   key: 'idTokenState',
-  default: null,
+  default: "",
 });
 
 export const expiresAtState = atom<number | null>({
   key: 'expiresAtState',
+  default: null,
+});
+export const optionService = atom<object | null>({
+  key: 'optionService',
   default: null,
 });

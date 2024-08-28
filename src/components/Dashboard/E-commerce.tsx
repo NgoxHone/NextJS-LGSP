@@ -17,7 +17,15 @@ import {
   fetchData,
   getTimestampRanges,
 } from "../../../utilities/GlobalFunction";
-import { data1, TotalDV, TotalPN, TotalRequest, TotalToday } from "./body";
+import {
+  bodyGetEdoc,
+  bodySendEdoc,
+  data1,
+  TotalDV,
+  TotalPN,
+  TotalRequest,
+  TotalToday,
+} from "./body";
 import Calendar from "../Calender";
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
@@ -44,13 +52,60 @@ const ECommerce = () => {
   const [TotalPNs, setTotalPN] = useState(0);
   const [TotalAPI, setTotalAPI] = useState(0);
   const [TotalAPIToday, setTotalAPIToday] = useState(0);
+  const [dataSentEdoc, setDataSentEdoc] = useState({
+    aggregations: {
+      group_by_api: {
+        buckets: [
+          {
+            key: "SentEdoc",
+            doc_count: 0,
+          },
+          {
+            key: "GetEdoc",
+            doc_count: 0,
+          },
+        ],
+      },
+    },
+  });
+  const updateSentEdocCount = (newCount, type) => {
+    setDataSentEdoc((prevState) => {
+      const updatedBuckets = prevState.aggregations.group_by_api.buckets.map(
+        (bucket) => {
+          if (bucket.key === type) {
+            return { ...bucket, doc_count: newCount };
+          }
+          return bucket;
+        },
+      );
+
+      return {
+        ...prevState,
+        aggregations: {
+          ...prevState.aggregations,
+          group_by_api: {
+            ...prevState.aggregations.group_by_api,
+            buckets: updatedBuckets,
+          },
+        },
+      };
+    });
+  };
+
   const [startDate, setStartDate] = useState(
     convertDateToMilliseconds(getLastMonthDate()),
   );
   const [endDate, setEndDate] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
-  console.log(today, yesterday);
+
+  const [startDate2, setStartDate2] = useState(
+    convertDateToMilliseconds(getLastMonthDate()),
+  );
+  const [endDate2, setEndDate2] = useState(
+    convertDateToMilliseconds(getTodayDate()),
+  );
+  console.log(startDate2, endDate2);
 
   const fetchDocuments = () => {
     setLoading(true);
@@ -79,7 +134,16 @@ const ECommerce = () => {
       setTotalAPIToday(dataRes?.aggregations?.counts_by_date?.buckets),
     );
   };
-
+  const fetchTotalSentEdoc = () => {
+    fetchData(bodySendEdoc(startDate2, endDate2), (dataRes) =>
+      updateSentEdocCount(dataRes?.count, "SentEdoc"),
+    );
+  };
+  const fetchTotalGetEdoc = () => {
+    fetchData(bodyGetEdoc(startDate2, endDate2), (dataRes) =>
+      updateSentEdocCount(dataRes?.count, "GetEdoc"),
+    );
+  };
   const divRef = useRef(null); // Tạo một ref
   const [divHeight, setDivHeight] = useState(0); // State để lưu chiều cao
   useEffect(() => {
@@ -91,6 +155,10 @@ const ECommerce = () => {
   useEffect(() => {
     fetchDocuments();
   }, [startDate, endDate]);
+  useEffect(() => {
+    fetchTotalGetEdoc();
+    fetchTotalSentEdoc();
+  }, [startDate2, endDate2]);
   useEffect(() => {
     fetchTotalRequest();
     fetchTotalPhanMem();
@@ -121,6 +189,13 @@ const ECommerce = () => {
 
   const handleEndDateChange = (date) => {
     setEndDate(convertDateToMilliseconds(date));
+  };
+  const handleStartDateChange2 = (date) => {
+    setStartDate2(convertDateToMilliseconds(date));
+  };
+
+  const handleEndDateChange2 = (date) => {
+    setEndDate2(convertDateToMilliseconds(date));
   };
   return (
     <>
@@ -189,7 +264,7 @@ const ECommerce = () => {
             </g>
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Product" total={TotalPNs}>
+        <CardDataStats title="Application" total={TotalPNs}>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -210,7 +285,7 @@ const ECommerce = () => {
         </CardDataStats>
         <CardDataStats
           title="Request hôm nay"
-          total={TotalAPIToday?.today?.doc_count || 0}
+          total={TotalAPIToday?.today?.doc_count?.toLocaleString("de-DE") || 0}
           rate={calculatePercentageChange(
             TotalAPIToday?.today?.doc_count,
             TotalAPIToday?.yesterday?.doc_count,
@@ -225,7 +300,7 @@ const ECommerce = () => {
           )}
         >
           <svg
-           className="fill-primary dark:fill-white"
+            className="fill-primary dark:fill-white"
             width="22"
             height="22"
             viewBox="0 0 512 512"
@@ -260,17 +335,27 @@ const ECommerce = () => {
               onStartDateChange={handleStartDateChange}
               onEndDateChange={handleEndDateChange}
               data={documents}
+              search={false}
             />
           </div>
-          <div className="mt-8 w-full">
+          {/* <div className="mt-8 w-full">
             <Calendar />
-          </div>
+          </div> */}
           <div className="mt-8 w-full">{/* <ChartThree /> */}</div>
         </div>
         <div
-          style={{ height: divHeight }}
+          style={{ marginBottom: 30 }}
           className="flex w-full flex-col xl:w-1/3"
         >
+          <TableFive
+            xuatEx={false}
+            onStartDateChange={handleStartDateChange2}
+            onEndDateChange={handleEndDateChange2}
+            data={dataSentEdoc}
+            search={false}
+            title="Thống kê gửi nhận văn bản"
+          />
+          <div className="mt-6" />
           <ChatCard height={divHeight} />
         </div>
       </div>
