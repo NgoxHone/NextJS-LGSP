@@ -1,4 +1,4 @@
-version: "3.8"  # Sử dụng phiên bản 3.8 để tận dụng các tính năng mới và cải thiện
+version: "3.3"  # Sử dụng phiên bản 3.8 để tận dụng các tính năng mới và cải thiện
 
 services:
   thongkelgsp:

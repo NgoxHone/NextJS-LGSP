@@ -8,12 +8,14 @@ WORKDIR /app
 COPY package*.json ./
 
 # Cài đặt các dependencies
-# RUN npm install --force
-
+RUN npm install --force
 
 # Sao chép các file trong dự án vào container
 COPY . .
+
+# Build ứng dụng
 RUN npm run build
+
 # Expose cổng mặc định của ứng dụng
 EXPOSE 3000
 
