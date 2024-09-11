@@ -154,3 +154,86 @@ export const dataByNgayTrongThang = {
     },
   },
 };
+
+export const dataApp = {
+  took: 184,
+  timed_out: false,
+  _shards: {
+    total: 5,
+    successful: 5,
+    skipped: 0,
+    failed: 0,
+  },
+  hits: {
+    total: {
+      value: 10000,
+      relation: "gte",
+    },
+    max_score: null,
+    hits: [],
+  },
+  aggregations: {
+    group_by_api: {
+      doc_count_error_upper_bound: 0,
+      sum_other_doc_count: 0,
+      buckets: [
+        {
+          key: "HTTTNCaMau",
+          doc_count: 16887144,
+        },
+        {
+          key: "Misa",
+          doc_count: 620423,
+        },
+        {
+          key: "DVC_CaMau",
+          doc_count: 205534,
+        },
+        {
+          key: "IOC_VNPT",
+          doc_count: 151561,
+        },
+        {
+          key: "CaMauG",
+          doc_count: 94818,
+        },
+        {
+          key: "T3H",
+          doc_count: 34395,
+        },
+        {
+          key: "iOffice",
+          doc_count: 22049,
+        },
+        {
+          key: "IOC_CaMau",
+          doc_count: 12512,
+        },
+        {
+          key: "Viettel",
+          doc_count: 212,
+        },
+        {
+          key: "PM_SoCongThuong",
+          doc_count: 81,
+        },
+        {
+          key: "CUSC_CanTho",
+          doc_count: 39,
+        },
+        {
+          key: "PM_SoTaiChinh",
+          doc_count: 34,
+        },
+        {
+          key: "CaMau_SoTaiChinh",
+          doc_count: 20,
+        },
+        {
+          key: "PMDuLieuGiaoThong",
+          doc_count: 1,
+        },
+      ],
+    },
+  },
+};

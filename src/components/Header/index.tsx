@@ -2,10 +2,58 @@ import Link from "next/link";
 import DarkModeSwitcher from "./DarkModeSwitcher";
 import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
+import { atom, useRecoilState } from "recoil";
 // import DropdownUser from "./DropdownUser";
 import Image from "next/image";
-import dynamic from 'next/dynamic';
-const DropdownUser = dynamic(() => import('./DropdownUser'), { ssr: false });
+import dynamic from "next/dynamic";
+import { optionEnviroment } from "../../../utilities/Atom/atom";
+const EnvironmentFilter = () => {
+  const [selectedEnv, setSelectedEnv] = useRecoilState(optionEnviroment);
+
+  const handleCheckboxChange = (env: string) => {
+    setSelectedEnv(env);
+  };
+
+  return (
+    <div className="flex items-center gap-4">
+      {/* Checkbox All */}
+      <label className="checkbox style-d">
+        <input
+          type="checkbox"
+          checked={selectedEnv === 'ALL'}
+          onChange={() => handleCheckboxChange('ALL')}
+        />
+        <span className="checkbox__checkmark"></span>
+        <span className="checkbox__body">All</span>
+      </label>
+
+      {/* Checkbox Sandbox */}
+      <label className="checkbox style-d">
+        <input
+          type="checkbox"
+          checked={selectedEnv === 'SANDBOX'}
+          onChange={() => handleCheckboxChange('SANDBOX')}
+        />
+        <span className="checkbox__checkmark"></span>
+        <span className="checkbox__body">Sandbox</span>
+      </label>
+
+      {/* Checkbox Product */}
+      <label className="checkbox style-d">
+        <input
+          type="checkbox"
+          checked={selectedEnv === 'PRODUCTION'}
+          onChange={() => handleCheckboxChange('PRODUCTION')}
+        />
+        <span className="checkbox__checkmark"></span>
+        <span className="checkbox__body">Product</span>
+      </label>
+    </div>
+  );
+};
+
+
+const DropdownUser = dynamic(() => import("./DropdownUser"), { ssr: false });
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
@@ -15,6 +63,7 @@ const Header = (props: {
       <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
           {/* <!-- Hamburger Toggle BTN --> */}
+
           <button
             aria-controls="sidebar"
             onClick={(e) => {
@@ -66,7 +115,7 @@ const Header = (props: {
             />
           </Link>
         </div>
-
+        <EnvironmentFilter />
         <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="relative">

@@ -1,24 +1,29 @@
-export function data1(start, end) {
+export function data1(start, end, selectedEnv) {
+  const filters = [
+    {
+      range: {
+        date_created: {
+          gt: start,
+          lt: end,
+        },
+      },
+    },
+  ];
+
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filters.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
   return {
     index: "apim-request-index/_search",
     body: {
       query: {
         bool: {
-          filter: [
-            {
-              range: {
-                date_created: {
-                  gt: start,
-                  lt: end,
-                },
-              },
-            },
-            {
-              term: {
-                am_key_type: "PRODUCTION",
-              },
-            },
-          ],
+          filter: filters,
         },
       },
       aggs: {
@@ -32,22 +37,28 @@ export function data1(start, end) {
     },
   };
 }
-export const TotalRequest = {
-  index: "apim-request-index/_count",
-  body: {
-    query: {
-      bool: {
-        filter: [
-          {
-            term: {
-              am_key_type: "PRODUCTION",
-            },
-          },
-        ],
+export const TotalRequest = (selectedEnv) => {
+  const filter = [];
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filter.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
+  return {
+    index: "apim-request-index/_count",
+    body: {
+      query: {
+        bool: {
+          filter: filter,
+        },
       },
     },
-  },
+  };
 };
+
 export const TotalPN = {
   index: "apim-request-index/_search",
   body: {
@@ -61,34 +72,93 @@ export const TotalPN = {
     },
   },
 };
-export const TotalDV = {
-  index: "apim-request-index/_search",
-  body: {
-    size: 0,
-    aggs: {
-      application_name_count: {
-        cardinality: {
-          field: "api",
+
+export const TotalPN2 = (start, end, selectedEnv) => {
+  const filters = [
+    {
+      range: {
+        date_created: {
+          gt: start,
+          lt: end,
         },
       },
     },
-  },
-};
+  ];
 
-export function TotalToday(today, yesterday) {
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filters.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
   return {
     index: "apim-request-index/_search",
     body: {
       size: 0,
       query: {
         bool: {
-          filter: [
-            {
-              term: {
-                am_key_type: "PRODUCTION",
-              },
-            },
-          ],
+          filter: filters,
+        },
+      },
+      aggs: {
+        group_by_api: {
+          terms: {
+            field: "application_name",
+            size: 50,
+          },
+        },
+      },
+    },
+  };
+};
+
+export const TotalDV = (selectedEnv) => {
+  const filter = {};
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filter.term = {
+      am_key_type: selectedEnv,
+    };
+  }
+
+  return {
+    index: "apim-request-index/_search",
+    body: {
+      size: 0,
+      query: {
+        bool: {
+          filter: [filter],
+        },
+      },
+      aggs: {
+        application_name_count: {
+          cardinality: {
+            field: "api",
+          },
+        },
+      },
+    },
+  };
+};
+
+export function TotalToday(today, yesterday, selectedEnv) {
+  const filter = [];
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filter.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
+  return {
+    index: "apim-request-index/_search",
+    body: {
+      size: 0,
+      query: {
+        bool: {
+          filter: filter,
         },
       },
       aggs: {

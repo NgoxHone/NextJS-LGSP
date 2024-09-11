@@ -280,6 +280,8 @@ import ChartThree from "../Charts/ChartThree";
 import { fetchData } from "../../../utilities/GlobalFunction";
 import { bodyByDay, bodyByTungNgay } from "../Charts/body";
 import { dataExTungNgay } from "../Charts/data";
+import { useRecoilState } from "recoil";
+import { optionEnviroment } from "../../../utilities/Atom/atom";
 
 function processCountByMonth(data) {
   const top5Items = data.aggregations.count_by_month.buckets.slice(0, 5);
@@ -293,8 +295,18 @@ function processCountByMonth(data) {
   return result;
 }
 const vietnameseMonths = [
-  "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
-  "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+  "Tháng 1",
+  "Tháng 2",
+  "Tháng 3",
+  "Tháng 4",
+  "Tháng 5",
+  "Tháng 6",
+  "Tháng 7",
+  "Tháng 8",
+  "Tháng 9",
+  "Tháng 10",
+  "Tháng 11",
+  "Tháng 12",
 ];
 const Calendar = () => {
   const [days, setDays] = useState([]);
@@ -306,28 +318,39 @@ const Calendar = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [dataTungNgay, setDataTungNgay] = useState(dataExTungNgay);
   const [data, setData] = useState(dataByNgayTrongThang);
+  const [selectedEnv] = useRecoilState(optionEnviroment);
   const [loading, setLoading] = useState(false);
   const fetchDocuments = () => {
     setLoading(true);
-    fetchData(bodyByDay([selectedMonth + 1], selectedYear), setData).finally(
-      () => setLoading(false),
-    );
+    fetchData(
+      bodyByDay([selectedMonth + 1], selectedYear, selectedEnv),
+      setData,
+    ).finally(() => setLoading(false));
   };
+  console.log(
+    "==XX===>",
+    bodyByDay([selectedMonth + 1], selectedYear, selectedEnv),
+  );
   const fetchDocumentsTungNgay = () => {
     console.log(
       bodyByTungNgay([selectedDate], [selectedMonth + 1], selectedYear),
     );
     setLoading(true);
     fetchData(
-      bodyByTungNgay([selectedDate], [selectedMonth + 1], selectedYear),
+      bodyByTungNgay(
+        [selectedDate],
+        [selectedMonth + 1],
+        selectedYear,
+        selectedEnv,
+      ),
       setDataTungNgay,
     ).finally(() => setLoading(false));
   };
   console.log("===>", processCountByMonth(dataTungNgay));
-  useEffect(() => fetchDocuments(), [selectedMonth, selectedYear]);
+  useEffect(() => fetchDocuments(), [selectedMonth, selectedYear, selectedEnv]);
   useEffect(
     () => fetchDocumentsTungNgay(),
-    [selectedMonth, selectedYear, selectedDate],
+    [selectedMonth, selectedYear, selectedDate, selectedEnv],
   );
 
   const temp = data?.aggregations?.count_by_day?.buckets?.map(
@@ -355,7 +378,7 @@ const Calendar = () => {
       {},
     );
     setDocCounts(counts);
-  }, [selectedYear, selectedMonth, data]);
+  }, [selectedYear, selectedMonth, data, selectedEnv]);
   console.log(docCounts);
   const handleYearChange = (event) => {
     setSelectedYear(Number(event.target.value));

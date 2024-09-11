@@ -5,6 +5,8 @@ import { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { useRecoilState } from "recoil";
 import { accessTokenState } from "../../../utilities/Atom/atom";
+import Table from "@/components/Tables/TableFive";
+import TableFour from "@/components/Tables/TableFour";
 // import SignIn from "../auth/signin/page";
 // export const metadata: Metadata = {
 //   title: "Thống kê request LGSP",
@@ -28,6 +30,15 @@ const CalendarPage = () => {
     ) : (
       <DefaultLayout>
         <Calendar />
+        {/* <Table
+            xuatEx={false}
+            // onStartDateChange={handleStartDateChange2}
+            // onEndDateChange={handleEndDateChange2}
+            // data={[]}
+            search={false}
+            title="Thống kê gửi nhận văn bản"
+          />
+        <TableFour/> */}
       </DefaultLayout>
     )}
   </>

@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import { dataEx } from "./data";
 import { fetchData } from "../../../utilities/GlobalFunction";
 import { bodyByWeek } from "./body";
+import { useRecoilState } from "recoil";
+import { optionEnviroment, optionService } from "../../../utilities/Atom/atom";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
@@ -106,16 +108,17 @@ function getCurrentMonth() {
 const ChartTwo: React.FC = () => {
   const [data, setData] = useState(dataEx);
   const [loading, setLoading] = useState(false);
+  const [selectedEnv] = useRecoilState(optionEnviroment);
 
   const fetchDocuments = () => {
     setLoading(true);
     fetchData(
-      bodyByWeek(getDatesOfCurrentWeek(), [getCurrentMonth()]),
+      bodyByWeek(getDatesOfCurrentWeek(), [getCurrentMonth()], selectedEnv),
       setData,
     ).finally(() => setLoading(false));
   };
   console.log(bodyByWeek(getDatesOfCurrentWeek(), [getCurrentMonth()]));
-  useEffect(() => fetchDocuments(), []);
+  useEffect(() => fetchDocuments(), [selectedEnv]);
   const temp = data.aggregations.count_by_day.buckets.map(
     (bucket) => bucket.doc_count,
   );

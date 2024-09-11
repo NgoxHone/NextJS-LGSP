@@ -12,6 +12,7 @@ import TableTwo from "../Tables/TableTwo";
 import TableThree from "../Tables/TableThree";
 import TableFour from "../Tables/TableFour";
 import TableFive from "../Tables/TableFive";
+import { useRouter } from "next/navigation";
 import {
   convertDateToMilliseconds,
   fetchData,
@@ -27,6 +28,9 @@ import {
   TotalToday,
 } from "./body";
 import Calendar from "../Calender";
+import { useRecoilState } from "recoil";
+import { optionEnviroment } from "../../../utilities/Atom/atom";
+
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
 });
@@ -37,7 +41,8 @@ const ChartThree = dynamic(() => import("@/components/Charts/ChartThree"), {
 const { today, yesterday } = getTimestampRanges();
 const getTodayDate = () => {
   const today = new Date();
-  return today.toISOString().split("T")[0];
+  today.setHours(23, 59, 59, 999);
+  return today.toISOString();
 };
 
 const getLastMonthDate = () => {
@@ -46,6 +51,8 @@ const getLastMonthDate = () => {
   return lastMonth.toISOString().split("T")[0];
 };
 const ECommerce = () => {
+  const router = useRouter();
+  const [selectedEnv] = useRecoilState(optionEnviroment);
   const [documents, setDocuments] = useState(data);
   const [loading, setLoading] = useState(false);
   const [Total, setTotal] = useState(0);
@@ -109,13 +116,13 @@ const ECommerce = () => {
 
   const fetchDocuments = () => {
     setLoading(true);
-    fetchData(data1(startDate, endDate), setDocuments).finally(() =>
-      setLoading(false),
+    fetchData(data1(startDate, endDate, selectedEnv), setDocuments).finally(
+      () => setLoading(false),
     );
   };
 
   const fetchTotalRequest = () => {
-    fetchData(TotalRequest, (dataRes) => setTotal(dataRes?.count));
+    fetchData(TotalRequest(selectedEnv), (dataRes) => setTotal(dataRes?.count));
   };
 
   const fetchTotalPhanMem = () => {
@@ -125,12 +132,12 @@ const ECommerce = () => {
   };
 
   const fetchTotalAPI = () => {
-    fetchData(TotalDV, (dataRes) =>
+    fetchData(TotalDV(selectedEnv), (dataRes) =>
       setTotalAPI(dataRes?.aggregations?.application_name_count?.value),
     );
   };
   const fetchTotalAPIToday = () => {
-    fetchData(TotalToday(today, yesterday), (dataRes) =>
+    fetchData(TotalToday(today, yesterday, selectedEnv), (dataRes) =>
       setTotalAPIToday(dataRes?.aggregations?.counts_by_date?.buckets),
     );
   };
@@ -154,17 +161,17 @@ const ECommerce = () => {
   }, []);
   useEffect(() => {
     fetchDocuments();
-  }, [startDate, endDate]);
+  }, [startDate, endDate,selectedEnv]);
   useEffect(() => {
     fetchTotalGetEdoc();
     fetchTotalSentEdoc();
-  }, [startDate2, endDate2]);
+  }, [startDate2, endDate2,selectedEnv]);
   useEffect(() => {
     fetchTotalRequest();
     fetchTotalPhanMem();
     fetchTotalAPI();
     fetchTotalAPIToday();
-  }, []);
+  }, [selectedEnv]);
   function calculatePercentageChange(today, yesterday) {
     if (!today) {
       return;
@@ -197,6 +204,7 @@ const ECommerce = () => {
   const handleEndDateChange2 = (date) => {
     setEndDate2(convertDateToMilliseconds(date));
   };
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
@@ -204,6 +212,7 @@ const ECommerce = () => {
           title="Request"
           total={Total.toLocaleString("de-DE")}
           // rate="0.43%"
+
           // levelUp
         >
           <svg
@@ -225,6 +234,7 @@ const ECommerce = () => {
           </svg>
         </CardDataStats>
         <CardDataStats
+          click={() => router.push("/services")}
           title="Dịch vụ"
           total={TotalAPI}
           // rate="4.35%" levelUp
@@ -264,7 +274,11 @@ const ECommerce = () => {
             </g>
           </svg>
         </CardDataStats>
-        <CardDataStats title="Application" total={TotalPNs}>
+        <CardDataStats
+          title="Application"
+          total={TotalPNs}
+          click={() => router.push("/applications")}
+        >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -353,6 +367,7 @@ const ECommerce = () => {
             onEndDateChange={handleEndDateChange2}
             data={dataSentEdoc}
             search={false}
+            lienthong={false}
             title="Thống kê gửi nhận văn bản"
           />
           <div className="mt-6" />

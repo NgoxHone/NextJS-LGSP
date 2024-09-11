@@ -87,7 +87,7 @@ export function getDatabaseDescription(id) {
       return "Cơ sở dữ liệu quốc gia về giá (Bộ Tài chính)";
     case "BoGTVT":
       return "Cơ sở dữ liệu đăng kiểm phương tiện (Bộ Giao thông vận tải)";
-    case "PM1C_LLTP":
+    case "LLTP-VNeID":
       return "Hệ thống cấp phiếu lý lịch tư pháp trực tuyến (Bộ Tư pháp)";
     case "QuanLyHoTich":
       return "Hệ thống thông tin đăng ký và quản lý hộ tịch (Bộ Tư pháp)";
@@ -125,6 +125,44 @@ export function getDatabaseDescription(id) {
       return "Hệ thống thông tin cơ sở dữ liệu nông nghiệp";
     case "TAUCA":
       return "Hệ thống thông tin tàu cá";
+    case "CDDH_ChinhPhu":
+      return "Hệ thống chỉ đạo điều hành chính phủ";
+    case "CSDL_DATDAI":
+      return "Cơ sở dữ liệu đất đai";
+    case "DMDC-NHNN":
+      return "Hệ thống danh mục dùng chung ngành ngân hàng (Ngân hàng Nhà nước Việt Nam)";
+    case "VDXP":
+      return "Hệ thông liên thông văn bản quốc gia";
+      case "VDXP_Product":
+      return "Hệ thông liên thông văn bản quốc gia";
+    case "VNPOST":
+      return "Hệ thống bưu điện quốc gia VNPOST";
+    case "GetEdoc":
+      return "GetEdoc";
+    case "SentEdoc":
+      return "SentEdoc";
+    case "HTTTNCaMau":
+      return "Hệ thống thông tin nguồn Cà Mau";
+    case "DVC_CaMau":
+      return "Phần mềm dịch vụ công Cà Mau";
+    case "CaMauG":
+      return "CaMauG";
+    case "T3H":
+      return "Trung tâm tin học (dùng để kiểm thử)";
+    case "IOC_CaMau":
+      return "Trung tâm điều hành Cà Mau";
+    case "Viettel":
+      return "Viettel";
+    case "PM_SoCongThuong":
+      return "Phần mềm sở công thương";
+    case "CUSC_CanTho":
+      return "Đại học Cần Thơ";
+    case "PM_SoTaiChinh":
+      return "Phần mềm sở tài chính";
+    case "CaMau_SoTaiChinh":
+      return "Sở tài chính";
+    case "PMDuLieuGiaoThong":
+      return "Phần mềm dữ liệu giao thông";
     default:
       return id;
   }

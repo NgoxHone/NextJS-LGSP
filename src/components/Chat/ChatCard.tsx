@@ -4,17 +4,25 @@ import { Chat } from "@/types/chat";
 import { formatTimestampToDate } from "../../../utilities/GlobalFunction";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { bodyLog, dataOption } from "./body";
+import { bodyLog, dataOption, dataOptionApp } from "./body";
 import MultiSelect from "../FormElements/MultiSelect";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
 import { useRecoilState } from "recoil";
-import { optionService } from "../../../utilities/Atom/atom";
+import { optionEnviroment, optionService } from "../../../utilities/Atom/atom";
 
 const ChatCard = ({ height }) => {
   const [optionData, setOptionData] = useRecoilState(optionService);
+  const [optionDataApp, setOptionDataApp] = useState([]);
+
   const [selectedOption, setSelectedOption] = useState("HTTTNTW");
+  const [selectedOptionApp, setSelectedOptionApp] = useState("HTTTNCaMau");
+
   const [data, setData] = useState([]);
-  // console.log(bodyLog("aa"))
+  const [selectedEnv] = useRecoilState(optionEnviroment);
+  console.log(
+    "ALO ALO",
+    bodyLog(selectedEnv, selectedOption, selectedOptionApp),
+  );
   const fetchData = async () => {
     try {
       const response = await axios({
@@ -23,7 +31,7 @@ const ChatCard = ({ height }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        data: bodyLog(selectedOption),
+        data: bodyLog(selectedEnv, selectedOption, selectedOptionApp),
       });
       const dataRes = response.data;
 
@@ -41,7 +49,7 @@ const ChatCard = ({ height }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        data: dataOption,
+        data: dataOption(selectedEnv),
       });
       const dataRes = response.data;
 
@@ -51,60 +59,96 @@ const ChatCard = ({ height }) => {
       console.error("Error fetching documents:", error);
     }
   };
+  const fetchOptionApp = async () => {
+    try {
+      const response = await axios({
+        method: "post",
+        url: "/api/service",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: dataOptionApp(selectedEnv),
+      });
+      const dataRes = response.data;
+
+      setOptionDataApp(dataRes);
+      // setLoading(false);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
+  };
   useEffect(() => {
     fetchOption();
-  }, []);
+    fetchOptionApp();
+  }, [selectedEnv]);
+
   useEffect(() => {
     fetchData();
-  }, [selectedOption]);
+  }, [selectedOption, selectedEnv, selectedOptionApp]);
 
   console.log(selectedOption);
   // Hàm xử lý khi người dùng chọn một giá trị mới từ dropdown
   const handleSelectChange = (value: string) => {
     setSelectedOption(value);
   };
+  const handleSelectAppChange = (value: string) => {
+    setSelectedOptionApp(value);
+  };
   // useEffect(() => {}, [height]);
   return (
     <div
-      style={{ borderRadius: 7, }}
+      style={{ borderRadius: 7 }}
       className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4"
     >
       <div className="mb-6 flex items-center justify-between px-7.5">
         {/* <h4 className="text-xl font-semibold text-black dark:text-white">
                 <MultiSelect />
         </h4> */}
-        <div style={{ alignSelf: "center" }}>
+        <div
+          style={{
+            alignSelf: "center",
+            display: "flex",
+            justifyContent: "space-evenly",
+          }}
+        >
+          <div className="mr-2">
+            {optionData != null && (
+              <SelectGroupTwo
+                onSelect={handleSelectChange}
+                label=""
+                options={optionData?.aggregations?.group_by_api?.buckets?.map(
+                  (i) => {
+                    return { value: i.key, label: i.key };
+                  },
+                )}
+              />
+            )}
+          </div>
+
           {optionData != null && (
             <SelectGroupTwo
-              onSelect={handleSelectChange}
+              onSelect={handleSelectAppChange}
               label=""
-              options={optionData?.aggregations?.group_by_api?.buckets?.map(
-                (i) => {
-                  return { value: i.key, label: i.key };
-                },
-              )}
+              options={[
+                { value: "Tất cả", label: "Tất cả" }, // Thêm tùy chọn "Tất cả"
+                ...(
+                  optionDataApp?.aggregations?.group_by_api?.buckets ?? []
+                ).map((i) => ({
+                  value: i.key,
+                  label: i.key,
+                })),
+              ]}
             />
           )}
         </div>
-
-        {/* <select
-          value={selectedOption}
-          onChange={handleSelectChange}
-          className="ml-4 border border-gray-300 rounded-md px-5 py-1 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-boxdark dark:text-white pr-8"
-        >
-          {optionData?.aggregations?.group_by_api?.buckets?.map((i, index) => (
-            <option value={i.key}>{i.key}</option>
-          ))}
-        </select> */}
       </div>
-
       {data?.hits?.hits?.length > 0 ? (
         <div
           style={{
             overflowY: "scroll",
             overflowX: "hidden",
             // minHeight: "50vh",
-            height:"150vh",
+            height: "150vh",
             paddingBottom: 20,
             scrollbarWidth: "thin" /* Firefox */,
             // scrollbarColor: "#888 #333" /* Firefox */,
@@ -128,7 +172,11 @@ const ChatCard = ({ height }) => {
                   <h5 className="font-medium text-blue-600 dark:text-blue-400">
                     {chat._source.api}
                   </h5>
-
+                  <p>
+                    <span className="text-sm text-sm text-pink-600 dark:text-green-400">
+                      {chat._source.am_key_type}
+                    </span>
+                  </p>
                   <p>
                     <span className="text-gray-700 dark:text-gray-300 text-sm">
                       {chat._source.full_request_path}

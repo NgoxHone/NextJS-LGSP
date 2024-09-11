@@ -10,7 +10,7 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 });
 import { bodyByYear } from "./body";
 import { useRecoilState } from "recoil";
-import { optionService } from "../../../utilities/Atom/atom";
+import { optionEnviroment, optionService } from "../../../utilities/Atom/atom";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
 
 interface ChartOneState {
@@ -21,6 +21,7 @@ interface ChartOneState {
 }
 const years = Array.from({ length: 5 }, (_, i) => 2023 + i);
 const ChartOne: React.FC = () => {
+  const [selectedEnv] = useRecoilState(optionEnviroment);
   let now = new Date();
   now.getFullYear();
   const [dataChar, setDataChar] = useState(data2);
@@ -31,14 +32,14 @@ const ChartOne: React.FC = () => {
 
   const fetchDocuments = () => {
     setLoading(true);
-    fetchData(bodyByYear(selectedYear, selectedOption), setDataChar).finally(() =>
+    fetchData(bodyByYear(selectedYear, selectedOption,selectedEnv), setDataChar).finally(() =>
       setLoading(false),
     );
   };
   const handleSelectChange = (value: string) => {
     setSelectedOption(value);
   };
-  useEffect(() => fetchDocuments(), [selectedOption,selectedYear]);
+  useEffect(() => fetchDocuments(), [selectedOption,selectedYear,selectedEnv]);
   function transformData(aggregations) {
     const result = [];
     const applications = {};
@@ -214,7 +215,7 @@ const ChartOne: React.FC = () => {
       <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
         <div className="flex w-full flex-wrap gap-3 sm:gap-5">
           {data.map((item, index) => (
-            <div className="flex min-w-47.5">
+            <div key={index} className="flex min-w-47.5">
               <span
                 style={{ borderColor: colors[index] }}
                 className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary"

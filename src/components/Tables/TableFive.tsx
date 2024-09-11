@@ -10,6 +10,8 @@ const Table = ({
   search = true,
   xuatEx = true,
   title = "",
+  lienthong = true,
+  app = false,
 }) => {
   const { aggregations } = data;
   const getTodayDate = () => {
@@ -42,15 +44,25 @@ const Table = ({
   );
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(
-      filteredData.map((bucket, index) => ({
-        STT: index + 1,
-        "Dịch vụ": getDatabaseDescription(bucket.key),
-        "Số lượng request": bucket.doc_count,
-      })),
-    );
-
-    worksheet["!cols"] = [{ wch: 5 }, { wch: 100 }, { wch: 20 }];
+    let worksheet;
+    if (app) {
+      worksheet = XLSX.utils.json_to_sheet(
+        filteredData.map((bucket, index) => ({
+          STT: index + 1,
+          "Phần mềm": getDatabaseDescription(bucket.key),
+          "Số lượng request": bucket.doc_count,
+        })),
+      );
+    } else {
+      worksheet = XLSX.utils.json_to_sheet(
+        filteredData.map((bucket, index) => ({
+          STT: index + 1,
+          "Dịch vụ": getDatabaseDescription(bucket.key),
+          "Số lượng request": bucket.doc_count,
+        })),
+      );
+    }
+    worksheet["!cols"] = [{ wch: 5 }, { wch: app ? 50 : 150 }, { wch: 20 }];
     for (let i = 1; i <= filteredData.length; i++) {
       worksheet[`A${i + 1}`].s = {
         alignment: { horizontal: "center" },
@@ -85,10 +97,18 @@ const Table = ({
       style={{ fontFamily: "'Roboto', sans-serif" }}
     >
       <div className="mb-6 flex flex-wrap items-center justify-between gap-6">
+        {title != "" && (
+          <p
+            style={{
+              fontSize: 17,
+              fontWeight: "bold",
+              fontFamily: "sans-serif",
+            }}
+          >
+            {title}
+          </p>
+        )}
         <div className="dark:text-gray-200 flex w-full flex-wrap items-center gap-6 dark:bg-boxdark sm:w-auto">
-          {title != "" && (
-            <p style={{ fontSize: 17, fontWeight: "bold",fontFamily:"sans-serif" }}>{title}</p>
-          )}
           <div className="flex-grow">
             <label className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium">
               Từ ngày
@@ -140,10 +160,20 @@ const Table = ({
       <div className="mt-6">
         <table className="mb-10 min-w-full table-auto">
           <thead style={{ backgroundColor: "#f3f4f6", borderRadius: 20 }}>
-            <tr className="bg-gray-200 text-gray-600 border-gray-300 text-sm uppercase leading-normal round-lg">
-              <th className="w-[70%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
-                Dịch vụ
+            <tr className="bg-gray-200 text-gray-600 border-gray-300 round-lg text-sm uppercase leading-normal">
+              <th className="w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
+                STT
               </th>
+              {lienthong && (
+                <th className="w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
+                  {app ? "Mã phần mềm" : "Mã dịch vụ"}
+                </th>
+              )}
+
+              <th className="w-[70%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
+                {app ? "Phần mềm" : "Dịch vụ"}
+              </th>
+
               <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 request
               </th>
@@ -158,7 +188,21 @@ const Table = ({
                 >
                   <td
                     style={{ alignItems: "center" }}
-                    className="flex items-center whitespace-normal px-6 py-3 text-left"
+                    className=" items-center whitespace-normal px-6 py-3 text-left"
+                  >
+                    {index + 1}
+                  </td>
+                  {lienthong && (
+                    <td
+                      style={{ alignItems: "center" }}
+                      className="items-center whitespace-normal px-6 py-3 text-left"
+                    >
+                      {bucket?.key}
+                    </td>
+                  )}
+                  <td
+                    style={{ alignItems: "center" }}
+                    className="items-center whitespace-normal px-6 py-3 text-left"
                   >
                     {getDatabaseDescription(bucket?.key)}
                   </td>
@@ -171,7 +215,7 @@ const Table = ({
                 </tr>
                 {index < filteredData.length - 1 && (
                   <tr>
-                    <td colSpan="2">
+                    <td colSpan="4">
                       <hr className="my-2 border-t border-[#cccccc] dark:border-[#4c4c4c]" />
                     </td>
                   </tr>

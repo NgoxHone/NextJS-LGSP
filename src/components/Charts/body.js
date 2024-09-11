@@ -1,32 +1,43 @@
-export function bodyByYear(y = 2024, api = "HTTTNTW") {
+export function bodyByYear(
+  y = 2024,
+  api = "HTTTNTW",
+  selectedEnv = "PRODUCTION",
+) {
+  // Khởi tạo điều kiện filter cho am_key_type
+  const filter = [
+    {
+      term: {
+        nam: y,
+      },
+    },
+    {
+      term: {
+        api: api,
+      },
+    },
+    {
+      exists: {
+        field: "api",
+      },
+    },
+  ];
+
+  // Nếu selectedEnv không phải là 'ALL', thêm điều kiện filter cho am_key_type
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filter.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
   return {
     index: "apim-request-index/_search",
     body: {
       size: 0,
       query: {
         bool: {
-          filter: [
-            {
-              term: {
-                nam: y,
-              },
-            },
-            {
-              term: {
-                am_key_type: "PRODUCTION",
-              },
-            },
-            {
-              term: {
-                api: api,
-              },
-            },
-            {
-              exists: {
-                field: "api",
-              },
-            },
-          ],
+          filter: filter,
         },
       },
       aggs: {
@@ -59,30 +70,47 @@ export function bodyByYear(y = 2024, api = "HTTTNTW") {
     },
   };
 }
-export function bodyByWeek(ngay = [11, 12, 13, 15, 16, 17, 18], thang = [7]) {
+
+export function bodyByWeek(
+  ngay = [11, 12, 13, 15, 16, 17, 18],
+  thang = [7],
+  selectedEnv = "PRODUCTION",
+) {
+  // Khởi tạo điều kiện filter cho am_key_type
+  const filter = [
+    {
+      term: {
+        nam: "2024",
+      },
+    },
+    {
+      terms: {
+        ngay: ngay,
+      },
+    },
+    {
+      terms: {
+        thang: thang,
+      },
+    },
+  ];
+
+  // Nếu selectedEnv không phải là 'ALL', thêm điều kiện filter cho am_key_type
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filter.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
   return {
     index: "apim-request-index/_search",
     body: {
       size: 0,
       query: {
         bool: {
-          filter: [
-            {
-              term: {
-                nam: "2024",
-              },
-            },
-            {
-              terms: {
-                ngay: ngay,
-              },
-            },
-            {
-              terms: {
-                thang: thang,
-              },
-            },
-          ],
+          filter: filter,
         },
       },
       aggs: {
@@ -99,25 +127,37 @@ export function bodyByWeek(ngay = [11, 12, 13, 15, 16, 17, 18], thang = [7]) {
   };
 }
 
-export function bodyByDay(thang = [8], nam = 2024) {
+export function bodyByDay(thang = [8], nam = 2024, selectedEnv = "PRODUCTION") {
+  // Khởi tạo điều kiện filter cho am_key_type
+  const filter = [
+    {
+      terms: {
+        thang: thang,
+      },
+    },
+    {
+      term: {
+        nam: nam,
+      },
+    },
+  ];
+
+  // Nếu selectedEnv không phải là 'ALL', thêm điều kiện filter cho am_key_type
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filter.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
   return {
     index: "apim-request-index/_search",
     body: {
       size: 0,
       query: {
         bool: {
-          must: [
-            {
-              terms: {
-                thang: thang,
-              },
-            },
-            {
-              term: {
-                nam: nam,
-              },
-            },
-          ],
+          must: filter,
         },
       },
       aggs: {
@@ -135,35 +175,47 @@ export function bodyByDay(thang = [8], nam = 2024) {
   };
 }
 
-export function bodyByTungNgay(ngay = [1], thang = [8], nam = 2024) {
+export function bodyByTungNgay(
+  ngay = [1],
+  thang = [8],
+  nam = 2024,
+  selectedEnv = "PRODUCTION",
+) {
+  // Khởi tạo điều kiện filter cho am_key_type
+  const filter = [
+    {
+      terms: {
+        ngay: ngay,
+      },
+    },
+    {
+      terms: {
+        thang: thang,
+      },
+    },
+    {
+      term: {
+        nam: nam,
+      },
+    },
+  ];
+
+  // Nếu selectedEnv không phải là 'ALL', thêm điều kiện filter cho am_key_type
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filter.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
   return {
     index: "apim-request-index/_search",
     body: {
       size: 0,
       query: {
         bool: {
-          must: [
-            {
-              terms: {
-                ngay: ngay,
-              },
-            },
-            {
-              terms: {
-                thang: thang,
-              },
-            },
-            {
-              term: {
-                nam: nam,
-              },
-            },
-            {
-              term: {
-                am_key_type: "PRODUCTION",
-              },
-            },
-          ],
+          must: filter,
         },
       },
       aggs: {
