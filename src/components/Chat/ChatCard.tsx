@@ -125,12 +125,12 @@ const ChatCard = ({ height }) => {
             )}
           </div>
 
-          {optionData != null && (
+          {/* {optionData != null && (
             <SelectGroupTwo
               onSelect={handleSelectAppChange}
               label=""
               options={[
-                { value: "Tất cả", label: "Tất cả" }, // Thêm tùy chọn "Tất cả"
+                { value: "Tất cả", label: "Tất cả" }, 
                 ...(
                   optionDataApp?.aggregations?.group_by_api?.buckets ?? []
                 ).map((i) => ({
@@ -139,7 +139,7 @@ const ChatCard = ({ height }) => {
                 })),
               ]}
             />
-          )}
+          )} */}
         </div>
       </div>
       {data?.hits?.hits?.length > 0 ? (
@@ -173,7 +173,7 @@ const ChatCard = ({ height }) => {
                     {chat._source.api}
                   </h5>
                   <p>
-                    <span className="text-sm text-sm text-pink-600 dark:text-green-400">
+                    <span className="text-sm text-sm text-pink-600 dark:text-pink-400">
                       {chat._source.am_key_type}
                     </span>
                   </p>

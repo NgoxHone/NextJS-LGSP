@@ -25,8 +25,8 @@ const Table = ({
     return lastMonth.toISOString().split("T")[0];
   };
 
-  const [startDate, setStartDate] = useState("2023-01-01");
-  const [endDate, setEndDate] = useState(getTodayDate());
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   console.log("Today==>", getTodayDate());
   const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debouncing 500ms

@@ -1,7 +1,10 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useRecoilState } from "recoil";
-import { accessTokenState, optionEnviroment } from "../../../utilities/Atom/atom";
+import {
+  accessTokenState,
+  optionEnviroment,
+} from "../../../utilities/Atom/atom";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef, useState } from "react";
 import { data1 } from "../../components/Dashboard/body";
@@ -11,6 +14,7 @@ import {
   fetchData,
   getTimestampRanges,
 } from "../../../utilities/GlobalFunction";
+import DetailServices from "@/components/DetailServices/DetailServices";
 const SignIn = dynamic(() => import("../auth/signin/page"), { ssr: false });
 const DefaultLayout = dynamic(
   () => import("@/components/Layouts/DefaultLayout"),
@@ -30,7 +34,7 @@ const getLastMonthDate = () => {
   lastMonth.setMonth(lastMonth.getMonth() - 1);
   return lastMonth.toISOString().split("T")[0];
 };
-const ServicesPage = () => {
+const DetailsPage = () => {
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [documents, setDocuments] = useState(data);
   const [accessToken] = useRecoilState(accessTokenState);
@@ -49,33 +53,25 @@ const ServicesPage = () => {
   };
   const fetchDocuments = () => {
     // setLoading(true);
-    fetchData(data1(startDate, endDate,selectedEnv), setDocuments).finally(
+    fetchData(data1(startDate, endDate, selectedEnv), setDocuments).finally(
       () => {},
       //   setLoading(false),
     );
   };
-  useEffect(() => fetchDocuments(), [startDate,endDate,selectedEnv]);
+  useEffect(() => fetchDocuments(), [startDate, endDate, selectedEnv]);
   return (
     <>
       {!accessToken ? (
         <SignIn />
       ) : (
         <DefaultLayout>
-        <Breadcrumb pageName="Services" />
+          <Breadcrumb pageName="Detail" />
 
-          <TableFive
-            // xuatEx={false}
-            onStartDateChange={handleStartDateChange}
-            onEndDateChange={handleEndDateChange}
-            data={documents}
-            search={false}
-            // lienthong={false}
-            // title="Thống kê gửi nhận văn bản"
-          />
+          <DetailServices />
         </DefaultLayout>
       )}
     </>
   );
 };
 
-export default ServicesPage;
+export default DetailsPage;

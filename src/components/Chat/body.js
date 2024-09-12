@@ -63,7 +63,7 @@ export function bodyLog(selectedEnv, name, app) {
   const filters = [];
 
   // Thêm bộ lọc cho api
-  if (name) {
+  if (name && name !== "Tất cả") {
     filters.push({
       term: {
         api: name,

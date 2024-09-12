@@ -7,7 +7,7 @@ interface SelectGroupTwoProps {
 }
 
 const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({ label, options, onSelect }) => {
-  const [selectedOption, setSelectedOption] = useState<string>("HTTTNTW");
+  const [selectedOption, setSelectedOption] = useState<string>("--");
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -26,7 +26,7 @@ const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({ label, options, onSelec
         <select
           value={selectedOption}
           onChange={handleChange}
-          className={`relative h-15 z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
+          className={`relative h-13 z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
         >
           <option value="" disabled>
             {label}
