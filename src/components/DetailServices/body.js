@@ -1,4 +1,4 @@
-export function bodyLog(selectedEnv, name, app, tu, den) {
+export function bodyLog(selectedEnv, name, app, tu, den, from = 0, size = 30) {
   const filters = [];
 
   // Thêm bộ lọc cho api
@@ -37,10 +37,12 @@ export function bodyLog(selectedEnv, name, app, tu, den) {
       },
     });
   }
+
   return {
     index: "apim-request-index/_search",
     body: {
-      size: 30,
+      from,   // Vị trí bắt đầu
+      size,   // Số lượng bản ghi mỗi trang
       query: {
         bool: {
           filter: filters,
@@ -49,7 +51,7 @@ export function bodyLog(selectedEnv, name, app, tu, den) {
       sort: [
         {
           date_created: {
-            order: "asc",
+            order: "desc",
           },
         },
       ],
