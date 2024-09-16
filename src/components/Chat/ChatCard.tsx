@@ -14,8 +14,8 @@ const ChatCard = ({ height }) => {
   const [optionData, setOptionData] = useRecoilState(optionService);
   const [optionDataApp, setOptionDataApp] = useState([]);
 
-  const [selectedOption, setSelectedOption] = useState("HTTTNTW");
-  const [selectedOptionApp, setSelectedOptionApp] = useState("HTTTNCaMau");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOptionApp, setSelectedOptionApp] = useState("");
 
   const [data, setData] = useState([]);
   const [selectedEnv] = useRecoilState(optionEnviroment);
@@ -114,13 +114,17 @@ const ChatCard = ({ height }) => {
           <div className="mr-2">
             {optionData != null && (
               <SelectGroupTwo
-                onSelect={handleSelectChange}
+                onSelect={handleSelectAppChange}
                 label=""
-                options={optionData?.aggregations?.group_by_api?.buckets?.map(
-                  (i) => {
-                    return { value: i.key, label: i.key };
-                  },
-                )}
+                options={[
+                  { value: "Tất cả", label: "Tất cả" },
+                  ...(
+                    optionDataApp?.aggregations?.group_by_api?.buckets ?? []
+                  ).map((i) => ({
+                    value: i.key,
+                    label: i.key,
+                  })),
+                ]}
               />
             )}
           </div>

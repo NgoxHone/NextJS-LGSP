@@ -32,14 +32,14 @@ const ChartOne: React.FC = () => {
 
   const fetchDocuments = () => {
     setLoading(true);
-    fetchData(bodyByYear(selectedYear, selectedOption,selectedEnv), setDataChar).finally(() =>
+    fetchData(bodyByYear(selectedYear, selectedOption, selectedEnv), setDataChar).finally(() =>
       setLoading(false),
     );
   };
   const handleSelectChange = (value: string) => {
     setSelectedOption(value);
   };
-  useEffect(() => fetchDocuments(), [selectedOption,selectedYear,selectedEnv]);
+  useEffect(() => fetchDocuments(), [selectedOption, selectedYear, selectedEnv]);
   function transformData(aggregations) {
     const result = [];
     const applications = {};
@@ -280,8 +280,8 @@ const ChartOne: React.FC = () => {
           <select
             value={selectedYear}
             onChange={handleYearChange}
-            className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 h-15 w-full appearance-none rounded-md border border-stroke bg-transparent px-4 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
-            // style={{ minHeight: "48px" }} // Đặt chiều cao tối thiểu để đồng nhất
+            className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 h-13 w-full appearance-none rounded-md border border-stroke bg-transparent px-4 py-2 outline-none transition focus:border-primary focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
+          // style={{ minHeight: "48px" }} // Đặt chiều cao tối thiểu để đồng nhất
           >
             {years.map((year) => (
               <option key={year} value={year}>
