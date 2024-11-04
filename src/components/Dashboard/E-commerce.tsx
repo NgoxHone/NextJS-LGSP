@@ -39,6 +39,7 @@ const ChartThree = dynamic(() => import("@/components/Charts/ChartThree"), {
   ssr: false,
 });
 const { today, yesterday } = getTimestampRanges();
+
 const getTodayDate = () => {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
@@ -50,6 +51,7 @@ const getLastMonthDate = () => {
   lastMonth.setMonth(lastMonth.getMonth() - 1);
   return lastMonth.toISOString().split("T")[0];
 };
+
 const ECommerce = () => {
   const router = useRouter();
   const [selectedEnv] = useRecoilState(optionEnviroment);
@@ -75,6 +77,37 @@ const ECommerce = () => {
       },
     },
   });
+  function calculatePercentageChange(today, yesterday) {
+    if (!today) return;
+    return (
+      (Math.round(((today - yesterday) / yesterday) * 10000) / 100).toFixed(2) +
+      "%"
+    );
+  }
+
+  function isLevelUp(today, yesterday) {
+    return today > yesterday;
+  }
+
+  function isLevelDown(today, yesterday) {
+    return today < yesterday;
+  }
+
+  const handleStartDateChange = (date) => {
+    setStartDate(convertDateToMilliseconds(date));
+  };
+
+  const handleEndDateChange = (date) => {
+    setEndDate(convertDateToMilliseconds(date));
+  };
+
+  const handleStartDateChange2 = (date) => {
+    setStartDate2(convertDateToMilliseconds(date));
+  };
+
+  const handleEndDateChange2 = (date) => {
+    setEndDate2(convertDateToMilliseconds(date));
+  };
   const updateSentEdocCount = (newCount, type) => {
     setDataSentEdoc((prevState) => {
       const updatedBuckets = prevState.aggregations.group_by_api.buckets.map(
@@ -112,7 +145,6 @@ const ECommerce = () => {
   const [endDate2, setEndDate2] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
-  console.log(startDate2, endDate2);
 
   const fetchDocuments = () => {
     setLoading(true);
@@ -133,79 +165,60 @@ const ECommerce = () => {
 
   const fetchTotalAPI = () => {
     fetchData(TotalDV(selectedEnv), (dataRes) =>
-      setTotalAPI(dataRes?.aggregations?.application_name_count?.value),
+      setTotalAPI(dataRes?.aggregations?.application_name_count?.value - 1),
     );
   };
+
   const fetchTotalAPIToday = () => {
     fetchData(TotalToday(today, yesterday, selectedEnv), (dataRes) =>
       setTotalAPIToday(dataRes?.aggregations?.counts_by_date?.buckets),
     );
   };
+
   const fetchTotalSentEdoc = () => {
-    fetchData(bodySendEdoc(startDate2, endDate2), (dataRes) =>
-      updateSentEdocCount(dataRes?.count, "SentEdoc"),
-    );
+    setLoading(true);
+    fetchData(bodySendEdoc(startDate2, endDate2), (dataRes) => {
+      updateSentEdocCount(dataRes?.count, "SentEdoc");
+      setLoading(false);
+    });
   };
+
   const fetchTotalGetEdoc = () => {
-    fetchData(bodyGetEdoc(startDate2, endDate2), (dataRes) =>
-      updateSentEdocCount(dataRes?.count, "GetEdoc"),
-    );
+    setLoading(true);
+    fetchData(bodyGetEdoc(startDate2, endDate2), (dataRes) => {
+      updateSentEdocCount(dataRes?.count, "GetEdoc");
+      setLoading(false);
+    });
   };
-  const divRef = useRef(null); // Tạo một ref
-  const [divHeight, setDivHeight] = useState(0); // State để lưu chiều cao
+
+  const divRef = useRef(null);
+  const [divHeight, setDivHeight] = useState(0);
+
   useEffect(() => {
     if (divRef.current) {
-      // Lấy chiều cao và cập nhật state
       setDivHeight(divRef.current.clientHeight);
     }
   }, []);
+
   useEffect(() => {
+    console.log("goi ham");
     fetchDocuments();
-  }, [startDate, endDate,selectedEnv]);
+  }, [startDate, endDate, selectedEnv]);
+
   useEffect(() => {
     fetchTotalGetEdoc();
     fetchTotalSentEdoc();
   }, [startDate2, endDate2]);
+
   useEffect(() => {
     fetchTotalRequest();
     fetchTotalPhanMem();
     fetchTotalAPI();
     fetchTotalAPIToday();
   }, [selectedEnv]);
-  function calculatePercentageChange(today, yesterday) {
-    if (!today) {
-      return;
-    }
-    return (
-      (Math.round(((today - yesterday) / yesterday) * 10000) / 100).toFixed(2) +
-      "%"
-    );
-  }
 
-  function isLevelUp(today, yesterday) {
-    return today > yesterday;
-  }
 
-  function isLevelDown(today, yesterday) {
-    return today < yesterday;
-  }
-
-  const handleStartDateChange = (date) => {
-    setStartDate(convertDateToMilliseconds(date));
-  };
-
-  const handleEndDateChange = (date) => {
-    setEndDate(convertDateToMilliseconds(date));
-  };
-  const handleStartDateChange2 = (date) => {
-    setStartDate2(convertDateToMilliseconds(date));
-  };
-
-  const handleEndDateChange2 = (date) => {
-    setEndDate2(convertDateToMilliseconds(date));
-  };
-
-  console.log('dokument11',documents)
+  console.log("dokument11", startDate);
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
@@ -276,7 +289,7 @@ const ECommerce = () => {
           </svg>
         </CardDataStats>
         <CardDataStats
-          title="Application"
+          title="Phần mềm"
           total={TotalPNs}
           click={() => router.push("/applications")}
         >
@@ -346,12 +359,14 @@ const ECommerce = () => {
       <div className="mt-4 flex flex-col gap-4 md:mt-6 md:gap-6 xl:flex-row 2xl:mt-7.5 2xl:gap-7.5">
         <div ref={divRef} className="flex w-full flex-col xl:w-2/3">
           <div className="flex-grow">
-            <TableFive
-              onStartDateChange={handleStartDateChange}
-              onEndDateChange={handleEndDateChange}
-              data={documents}
-              search={false}
-            />
+            {!loading && (
+              <TableFive
+                onStartDateChange={handleStartDateChange}
+                onEndDateChange={handleEndDateChange}
+                data={documents}
+                search={false}
+              />
+            )}
           </div>
           {/* <div className="mt-8 w-full">
             <Calendar />

@@ -65,7 +65,7 @@ const DetailsPage = () => {
         <SignIn />
       ) : (
         <DefaultLayout>
-          <Breadcrumb pageName="Detail" />
+          <Breadcrumb pageName="Chi tiết dịch vụ" />
 
           <DetailServices />
         </DefaultLayout>

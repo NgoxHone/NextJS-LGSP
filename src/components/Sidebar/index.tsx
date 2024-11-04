@@ -65,7 +65,7 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Calendar",
+        label: "Thống kê theo lịch",
         route: "/calendar",
       },
       {
@@ -96,7 +96,7 @@ const menuGroups = [
             </defs>
           </svg>
         ),
-        label: "Services",
+        label: "Dịch vụ",
         route: "/services",
       },
       {
@@ -131,7 +131,7 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Applications",
+        label: "Phần mềm",
         route: "/applications",
       },
       {
@@ -157,7 +157,7 @@ const menuGroups = [
             </g>
           </svg>
         ),
-        label: "Details",
+        label: "Chi tiết dịch vụ",
         route: "/details",
       },
       // {

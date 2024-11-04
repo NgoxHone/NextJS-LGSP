@@ -65,7 +65,7 @@ const ApplicationsPage = () => {
         <SignIn />
       ) : (
         <DefaultLayout>
-          <Breadcrumb pageName="Applications" />
+          <Breadcrumb pageName="Phần mềm" />
 
           <TableFive
             // xuatEx={false}

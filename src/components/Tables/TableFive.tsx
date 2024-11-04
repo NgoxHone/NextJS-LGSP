@@ -178,8 +178,8 @@ const Table = ({
                 request
               </th>
               {lienthong && (
-                <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
-                  request thất bại
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
+                  không thành công
                 </th>
               )}
             </tr>
@@ -239,7 +239,7 @@ const Table = ({
                 </tr>
                 {index < filteredData.length - 1 && (
                   <tr>
-                    <td colSpan="4">
+                    <td colSpan="6">
                       <hr className="my-2 border-t border-[#cccccc] dark:border-[#4c4c4c]" />
                     </td>
                   </tr>

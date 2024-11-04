@@ -147,7 +147,7 @@ export const TotalDV = (selectedEnv) => {
   }
 
   return {
-    index: "apim-request-index/_search",
+    index: "apim-response-index/_search",
     body: {
       size: 0,
       query: {
