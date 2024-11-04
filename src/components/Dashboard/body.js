@@ -10,6 +10,7 @@ export function data1(start, end, selectedEnv) {
     },
   ];
 
+  // Nếu môi trường đã chọn không phải là "ALL", thêm điều kiện vào bộ lọc
   if (selectedEnv && selectedEnv !== "ALL") {
     filters.push({
       term: {
@@ -19,7 +20,7 @@ export function data1(start, end, selectedEnv) {
   }
 
   return {
-    index: "apim-request-index/_search",
+    index: "apim-response-index/_search",
     body: {
       query: {
         bool: {
@@ -31,12 +32,35 @@ export function data1(start, end, selectedEnv) {
           terms: {
             field: "api",
             size: 50,
+            exclude: ["null"],  
+          },
+          aggs: {
+            unique_correlation_count: {
+              cardinality: {
+                field: "correlation_id",  // Đếm số lượng correlation_id duy nhất cho từng api
+              },
+            },
+            by_failure: {
+              filter: {
+                term: {
+                  isSuccess: false,  // Chỉ lọc các tài liệu có isSuccess là false
+                },
+              },
+              aggs: {
+                unique_failure_count: {
+                  cardinality: {
+                    field: "correlation_id",  // Đếm số lượng correlation_id duy nhất cho các tài liệu thất bại
+                  },
+                },
+              },
+            },
           },
         },
       },
     },
   };
 }
+
 export const TotalRequest = (selectedEnv) => {
   const filter = [];
   if (selectedEnv && selectedEnv !== "ALL") {

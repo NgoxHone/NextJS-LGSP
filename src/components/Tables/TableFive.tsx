@@ -177,6 +177,11 @@ const Table = ({
               <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 request
               </th>
+              {lienthong && (
+                <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
+                  request thất bại
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
@@ -210,8 +215,27 @@ const Table = ({
                     style={{ fontWeight: "bold" }}
                     className="px-6 py-3 text-left"
                   >
-                    {bucket.doc_count.toLocaleString()}
+                    {!lienthong
+                      ? bucket?.doc_count?.toLocaleString()
+                      : bucket?.unique_correlation_count?.value?.toLocaleString()}
                   </td>
+                  {lienthong && (
+                    <td
+                      style={{ fontWeight: "bold" }}
+                      className="px-6 py-3 text-left"
+                    >
+                      {bucket?.by_failure?.unique_failure_count?.value?.toLocaleString()}{" "}
+                      {/* (
+                      {bucket?.unique_correlation_count?.value > 0
+                        ? Math.round(
+                            (bucket?.by_failure?.unique_failure_count?.value /
+                              bucket?.unique_correlation_count?.value) *
+                              100,
+                          ).toLocaleString() + "%"
+                        : "0%"}
+                      ) */}
+                    </td>
+                  )}
                 </tr>
                 {index < filteredData.length - 1 && (
                   <tr>
