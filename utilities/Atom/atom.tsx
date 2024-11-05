@@ -24,5 +24,5 @@ export const optionEnviroment = atom<string | null>({
 });
 export const optionOptionApp = atom<string | null>({
   key: "optionOptionApp",
-  default: "null",
+  default: null,
 });
