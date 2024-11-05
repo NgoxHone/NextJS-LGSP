@@ -3,6 +3,11 @@ import * as XLSX from "xlsx";
 import useDebounce from "../../hooks/useDebounce";
 import MultiSelect from "../FormElements/MultiSelect";
 import { getDatabaseDescription } from "../../../utilities/GlobalFunction";
+import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
+import axios from "axios";
+import { dataOptionApp } from "../Chat/body";
+import { optionEnviroment, optionOptionApp } from "../../../utilities/Atom/atom";
+import { useRecoilState } from "recoil";
 const Table = ({
   data,
   onStartDateChange,
@@ -25,13 +30,36 @@ const Table = ({
     lastMonth.setFullYear(lastMonth.getFullYear() - 1);
     return lastMonth.toISOString().split("T")[0];
   };
-
+  const [selectedEnv] = useRecoilState(optionEnviroment);
+  const [selectedOptionApp, setSelectedOptionApp] = useRecoilState(optionOptionApp);
+  const [optionDataApp, setOptionDataApp] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   console.log("Today==>", getTodayDate());
   const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debouncing 500ms
+  const fetchOptionApp = async () => {
+    try {
+      const response = await axios({
+        method: "post",
+        url: "/api/service",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: dataOptionApp(selectedEnv),
+      });
+      const dataRes = response.data;
 
+      setOptionDataApp(dataRes);
+      // setLoading(false);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
+  };
+  useEffect(() => {
+    // fetchOption();
+    fetchOptionApp();
+  }, [selectedEnv]);
   const handleDateChange = (e, setDate) => {
     setDate(e.target.value);
   };
@@ -84,7 +112,9 @@ const Table = ({
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
     XLSX.writeFile(workbook, "ThongKeLGSP.xlsx");
   };
-
+  const handleSelectAppChange = (value: string) => {
+    setSelectedOptionApp(value);
+  };
   useEffect(() => {
     onStartDateChange(startDate);
   }, [startDate, onStartDateChange]);
@@ -133,8 +163,27 @@ const Table = ({
             />
           </div>
         </div>
-
-        {search && (
+        {lienthong && <div className="mr-2">
+          {optionDataApp != null && (<>
+            <label className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium">
+              Phần mềm
+            </label>
+            <SelectGroupTwo
+              onSelect={handleSelectAppChange}
+              label=""
+              options={[
+                { value: "Tất cả", label: "Tất cả" },
+                ...(
+                  optionDataApp?.aggregations?.group_by_api?.buckets ?? []
+                ).map((i) => ({
+                  value: i.key,
+                  label: i.key,
+                })),
+              ]}
+            />
+          </>)}
+        </div>}
+        {/* {search && (
           <div className="w-full sm:w-1/3">
             <label className="text-gray-700 mb-1 block text-sm font-medium">
               Tìm kiếm
@@ -147,7 +196,7 @@ const Table = ({
               className="border-gray-400 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input"
             />
           </div>
-        )}
+        )} */}
         {xuatEx && (
           <button
             style={{ alignSelf: "flex-end", backgroundColor: "#3C50E0" }}
@@ -178,11 +227,14 @@ const Table = ({
               <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 request
               </th>
-              {lienthong && (
+              {lienthong && (<>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
+                  thành công
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
                   không thành công
                 </th>
-              )}
+              </>)}
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
@@ -221,22 +273,42 @@ const Table = ({
                       : bucket?.unique_correlation_count?.value?.toLocaleString()}
                   </td>
                   {lienthong && (
-                    <td
-                      style={{ fontWeight: "bold" }}
-                      className="px-6 py-3 text-left"
-                    >
-                      {bucket?.by_failure?.unique_failure_count?.value?.toLocaleString()}{" "}
-                      {/* (
-                      {bucket?.unique_correlation_count?.value > 0
-                        ? Math.round(
+                    <>
+                      <td
+                        style={{ fontWeight: "bold", textAlign: 'center' }}
+                        className="px-6 py-3 text-left"
+                      >
+                        {(bucket?.unique_correlation_count?.value - bucket?.by_failure?.unique_failure_count?.value).toLocaleString()}{"\n"}
+                        (
+                        {bucket?.unique_correlation_count?.value > 0
+                          ? Math.round(
+                            ((bucket?.unique_correlation_count?.value - bucket?.by_failure?.unique_failure_count?.value) /
+                              bucket?.unique_correlation_count?.value) *
+                            100,
+                          ).toLocaleString() + "%"
+                          : "0%"}
+                        )
+                      </td>
+                      <td
+                        style={{ fontWeight: "bold", textAlign: 'center' }}
+                        className="px-6 py-3 text-left"
+                      >
+                        {bucket?.by_failure?.unique_failure_count?.value?.toLocaleString()}
+                        <br />
+                        (
+                        {bucket?.unique_correlation_count?.value > 0
+                          ? Math.round(
                             (bucket?.by_failure?.unique_failure_count?.value /
                               bucket?.unique_correlation_count?.value) *
-                              100,
+                            100,
                           ).toLocaleString() + "%"
-                        : "0%"}
-                      ) */}
-                    </td>
+                          : "0%"}
+                        )
+                      </td>
+
+                    </>
                   )}
+
                 </tr>
                 {index < filteredData.length - 1 && (
                   <tr>

@@ -29,7 +29,7 @@ import {
 } from "./body";
 import Calendar from "../Calender";
 import { useRecoilState } from "recoil";
-import { optionEnviroment } from "../../../utilities/Atom/atom";
+import { optionEnviroment, optionOptionApp } from "../../../utilities/Atom/atom";
 
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
@@ -54,6 +54,7 @@ const getLastMonthDate = () => {
 
 const ECommerce = () => {
   const router = useRouter();
+  const [selectedOptionApp] = useRecoilState(optionOptionApp);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [documents, setDocuments] = useState(data);
   const [loading, setLoading] = useState(false);
@@ -148,7 +149,7 @@ const ECommerce = () => {
 
   const fetchDocuments = () => {
     setLoading(true);
-    fetchData(data1(startDate, endDate, selectedEnv), setDocuments).finally(
+    fetchData(data1(startDate, endDate, selectedEnv, selectedOptionApp), setDocuments).finally(
       () => setLoading(false),
     );
   };
@@ -203,7 +204,7 @@ const ECommerce = () => {
   useEffect(() => {
     console.log("goi ham");
     fetchDocuments();
-  }, [startDate, endDate, selectedEnv]);
+  }, [startDate, endDate, selectedEnv,selectedOptionApp]);
 
   useEffect(() => {
     fetchTotalGetEdoc();
@@ -218,7 +219,7 @@ const ECommerce = () => {
   }, [selectedEnv]);
 
 
-  console.log("dokument11", startDate);
+  console.log("dokument11", data1(startDate, endDate, selectedEnv, selectedOptionApp));
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
