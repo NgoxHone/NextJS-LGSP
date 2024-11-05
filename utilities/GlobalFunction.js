@@ -69,6 +69,30 @@ export const fetchData = async (data, setState, path = "/api/service") => {
     console.error("Error fetching documents:", error);
   }
 };
+export const fetchData2 = async (data, setState, path = "/api/service") => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: path,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    });
+    const dataRes = response.data;
+
+    // Update state if setState is provided
+    if (setState) {
+      setState(dataRes);
+    }
+
+    // Return the response data
+    return dataRes;
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    throw error; // Optionally rethrow the error for handling in the caller function
+  }
+};
 export function getDatabaseDescription(id) {
   switch (id) {
     case 1:
@@ -133,7 +157,7 @@ export function getDatabaseDescription(id) {
       return "Hệ thống danh mục dùng chung ngành ngân hàng (Ngân hàng Nhà nước Việt Nam)";
     case "VDXP":
       return "Hệ thông liên thông văn bản quốc gia";
-      case "VDXP_Product":
+    case "VDXP_Product":
       return "Hệ thông liên thông văn bản quốc gia";
     case "VNPOST":
       return "Hệ thống bưu điện quốc gia VNPOST";

@@ -45,7 +45,7 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Dashboard",
+        label: <p style={{ fontFamily: 'sans-serif' }}>Dashboard</p>,
         route: "/",
         // children: [{ label: "eCommerce", route: "/" }],
       },
@@ -65,7 +65,7 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Thống kê theo lịch",
+        label: <p style={{ fontFamily: 'sans-serif' }}>Thống kê theo lịch</p>,
         route: "/calendar",
       },
       {
@@ -96,7 +96,7 @@ const menuGroups = [
             </defs>
           </svg>
         ),
-        label: "Dịch vụ",
+        label: <p style={{ fontFamily: 'sans-serif' }}>Dịch vụ</p>,
         route: "/services",
       },
       {
@@ -131,7 +131,7 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Phần mềm",
+        label: <p style={{ fontFamily: 'sans-serif' }}>Phần mềm</p>,
         route: "/applications",
       },
       {
@@ -157,7 +157,7 @@ const menuGroups = [
             </g>
           </svg>
         ),
-        label: "Chi tiết dịch vụ",
+        label: <p style={{ fontFamily: 'sans-serif' }}>Chi tiết dịch vụ</p>,
         route: "/details",
       },
       // {
@@ -359,9 +359,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`fixed left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">

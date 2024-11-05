@@ -5,8 +5,8 @@ import MultiSelect from "../FormElements/MultiSelect";
 import { getDatabaseDescription } from "../../../utilities/GlobalFunction";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
 import axios from "axios";
-import { dataOptionApp } from "../Chat/body";
-import { optionEnviroment, optionOptionApp } from "../../../utilities/Atom/atom";
+import { dataOption, dataOptionApp } from "../Chat/body";
+import { optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
 import { useRecoilState } from "recoil";
 const Table = ({
   data,
@@ -32,7 +32,9 @@ const Table = ({
   };
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp, setSelectedOptionApp] = useRecoilState(optionOptionApp);
+  const [selectedOption, setSelectedOption] = useRecoilState(optionOption);
   const [optionDataApp, setOptionDataApp] = useState([]);
+  const [optionData, setOptionData] = useRecoilState(optionService);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,8 +58,27 @@ const Table = ({
       console.error("Error fetching documents:", error);
     }
   };
+  const fetchOption = async () => {
+    try {
+      const response = await axios({
+        method: "post",
+        url: "/api/service",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: dataOption(selectedEnv),
+      });
+      const dataRes = response.data;
+
+      setOptionData(dataRes);
+      // setLoading(false);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
+  };
   useEffect(() => {
     // fetchOption();
+    fetchOption()
     fetchOptionApp();
   }, [selectedEnv]);
   const handleDateChange = (e, setDate) => {
@@ -115,6 +136,9 @@ const Table = ({
   const handleSelectAppChange = (value: string) => {
     setSelectedOptionApp(value);
   };
+  const handleSelectChange = (value: string) => {
+    setSelectedOption(value);
+  };
   useEffect(() => {
     onStartDateChange(startDate);
   }, [startDate, onStartDateChange]);
@@ -162,27 +186,50 @@ const Table = ({
               className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
             />
           </div>
+          {lienthong && <div className="mr-0">
+            {optionDataApp != null && (<>
+              <label className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium">
+                Phần mềm
+              </label>
+              <SelectGroupTwo
+                onSelect={handleSelectAppChange}
+                label=""
+                options={[
+                  { value: "Tất cả", label: "Tất cả" },
+                  ...(
+                    optionDataApp?.aggregations?.group_by_api?.buckets ?? []
+                  ).map((i) => ({
+                    value: i.key,
+                    label: i.key,
+                  })),
+                ]}
+              />
+            </>)}
+
+          </div>}
+          {app && <div className="mr-0">
+            {optionData != null && (<>
+              <label className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium">
+                Dịch vụ
+              </label>
+              <SelectGroupTwo
+                onSelect={handleSelectChange}
+                label=""
+                options={[
+                  { value: "Tất cả", label: "Tất cả" },
+                  ...(
+                    optionData?.aggregations?.group_by_api?.buckets ?? []
+                  ).map((i) => ({
+                    value: i.key,
+                    label: i.key,
+                  })),
+                ]}
+              />
+            </>)}
+
+          </div>}
         </div>
-        {lienthong && <div className="mr-2">
-          {optionDataApp != null && (<>
-            <label className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium">
-              Phần mềm
-            </label>
-            <SelectGroupTwo
-              onSelect={handleSelectAppChange}
-              label=""
-              options={[
-                { value: "Tất cả", label: "Tất cả" },
-                ...(
-                  optionDataApp?.aggregations?.group_by_api?.buckets ?? []
-                ).map((i) => ({
-                  value: i.key,
-                  label: i.key,
-                })),
-              ]}
-            />
-          </>)}
-        </div>}
+
         {/* {search && (
           <div className="w-full sm:w-1/3">
             <label className="text-gray-700 mb-1 block text-sm font-medium">
@@ -216,7 +263,7 @@ const Table = ({
               </th>
               {lienthong && (
                 <th className="w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
-                  {app ? "Mã phần mềm" : "Mã dịch vụ"}
+                  {app ? "Mã" : "Mã"}
                 </th>
               )}
 
@@ -227,12 +274,12 @@ const Table = ({
               <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 request
               </th>
-              {lienthong && (<>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
+              {lienthong && !app && (<>
+                <th style={{ textAlign: 'center' }} className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
                   thành công
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
-                  không thành công
+                <th style={{ textAlign: 'center' }} className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
+                  thất bại
                 </th>
               </>)}
             </tr>
@@ -259,7 +306,7 @@ const Table = ({
                     </td>
                   )}
                   <td
-                    style={{ alignItems: "center" }}
+                    style={{ alignItems: "center", textAlign: 'justify' }}
                     className="items-center whitespace-normal px-6 py-3 text-left"
                   >
                     {getDatabaseDescription(bucket?.key)}
@@ -268,46 +315,74 @@ const Table = ({
                     style={{ fontWeight: "bold" }}
                     className="px-6 py-3 text-left"
                   >
-                    {!lienthong
+                    {/* {!lienthong
                       ? bucket?.doc_count?.toLocaleString()
-                      : bucket?.unique_correlation_count?.value?.toLocaleString()}
+                      : bucket?.unique_correlation_count?.value?.toLocaleString()} */}
+                    {bucket?.doc_count?.toLocaleString()}
                   </td>
-                  {lienthong && (
+                  {lienthong && !app && (
                     <>
                       <td
                         style={{ fontWeight: "bold", textAlign: 'center' }}
                         className="px-6 py-3 text-left"
-                      >
-                        {(bucket?.unique_correlation_count?.value - bucket?.by_failure?.unique_failure_count?.value).toLocaleString()}{"\n"}
-                        (
-                        {bucket?.unique_correlation_count?.value > 0
-                          ? Math.round(
-                            ((bucket?.unique_correlation_count?.value - bucket?.by_failure?.unique_failure_count?.value) /
-                              bucket?.unique_correlation_count?.value) *
-                            100,
-                          ).toLocaleString() + "%"
-                          : "0%"}
-                        )
+                      >  {(() => {
+                        // Destructure values for better readability
+                        const uniqueCount = bucket?.unique_correlation_count?.value;
+                        const docCount = bucket?.doc_count;
+
+                        // Determine what to display
+                        if (uniqueCount > docCount) {
+                          return docCount.toLocaleString(); // Show doc_count if unique_count exceeds it
+                        } else if (uniqueCount) {
+                          return uniqueCount.toLocaleString(); // Show unique_count if it exists
+                        } else {
+                          return "0"; // Fallback value if both counts are not present
+                        }
+                      })()}
+                        {"\n"}
+                        {/* {bucket?.unique_correlation_count?.value > bucket?.doc_count ? bucket?.doc_count : bucket?.doc_count ? bucket?.unique_correlation_count?.value.toLocaleString()}{"\n"} */}
+                        ({Math.round(
+                          (bucket?.unique_correlation_count?.value > bucket?.doc_count
+                            ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
+                            : bucket?.unique_correlation_count?.value) / bucket?.doc_count * 100
+                        ).toLocaleString() + "%"})
+                        {/* {bucket?.unique_correlation_count?.value.toLocaleString()}{"\n"}
+                        ({
+                          bucket?.unique_correlation_count?.value > 0
+                            ? Math.round(
+                              (bucket?.unique_correlation_count?.value > bucket?.doc_count
+                                ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
+                                : bucket?.unique_correlation_count?.value) / bucket?.doc_count * 100
+                            ).toLocaleString() + "%"
+                            : "0%"
+                        }) */}
                       </td>
                       <td
                         style={{ fontWeight: "bold", textAlign: 'center' }}
                         className="px-6 py-3 text-left"
                       >
-                        {bucket?.by_failure?.unique_failure_count?.value?.toLocaleString()}
+                        {bucket?.unique_correlation_count?.value > bucket?.doc_count ? 0 : (bucket?.doc_count - (bucket?.unique_correlation_count?.value || 0)).toLocaleString()}
                         <br />
-                        (
-                        {bucket?.unique_correlation_count?.value > 0
-                          ? Math.round(
-                            (bucket?.by_failure?.unique_failure_count?.value /
-                              bucket?.unique_correlation_count?.value) *
-                            100,
-                          ).toLocaleString() + "%"
-                          : "0%"}
-                        )
+                        ({
+                          !bucket?.unique_correlation_count?.value > bucket?.doc_count
+                            ? "100%" // If unique_correlation_count exceeds doc_count, display 100%
+                            : bucket?.unique_correlation_count?.value > 0
+                              ? (() => {
+                                // Calculate the percentage
+                                const percentage = 100 - Math.round(
+                                  (bucket?.unique_correlation_count?.value / bucket?.doc_count) * 100
+                                );
+                                // Return 0% if the calculated percentage is less than 0
+                                return percentage < 0 ? "0%" : percentage.toLocaleString() + "%";
+                              })() // IIFE for inline calculation
+                              : "0%" // If unique_correlation_count is 0 or not present, display 0%
+                        })
                       </td>
+
 
                     </>
                   )}
+
 
                 </tr>
                 {index < filteredData.length - 1 && (

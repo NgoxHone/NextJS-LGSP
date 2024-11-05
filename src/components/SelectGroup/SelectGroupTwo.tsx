@@ -19,7 +19,7 @@ const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({ label, options, onSelec
 
   return (
     <div>
-      <label className="block text-sm font-medium text-black dark:text-white">
+      <label style={{ fontFamily: 'sans-serif' }} className="block text-sm font-medium text-black dark:text-white">
         {label}
       </label>
       <div className="relative z-20 bg-white dark:bg-form-input">
@@ -28,7 +28,7 @@ const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({ label, options, onSelec
           onChange={handleChange}
           className={`relative h-13 z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
         >
-          <option value="" disabled>
+          <option style={{ fontFamily: 'sans-serif' }} value="" disabled>
             {label}
           </option>
           {options?.map((option) => (

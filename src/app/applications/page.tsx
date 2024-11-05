@@ -4,6 +4,8 @@ import { useRecoilState } from "recoil";
 import {
   accessTokenState,
   optionEnviroment,
+  optionOption,
+  optionService,
 } from "../../../utilities/Atom/atom";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef, useState } from "react";
@@ -34,6 +36,7 @@ const getLastMonthDate = () => {
   return lastMonth.toISOString().split("T")[0];
 };
 const ApplicationsPage = () => {
+  const [optionData] = useRecoilState(optionService);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [documents, setDocuments] = useState(dataApp);
   const [accessToken] = useRecoilState(accessTokenState);
@@ -50,15 +53,16 @@ const ApplicationsPage = () => {
   const handleEndDateChange = (date) => {
     setEndDate(convertDateToMilliseconds(date));
   };
+  const [selectedOption, setSelectedOption] = useRecoilState(optionOption);
   const fetchDocuments = () => {
     // setLoading(true);
-    fetchData(TotalPN2(startDate, endDate, selectedEnv), setDocuments).finally(
-      () => {},
+    fetchData(TotalPN2(startDate, endDate, selectedEnv,selectedOption), setDocuments).finally(
+      () => { },
       //   setLoading(false),
     );
   };
   console.log(documents);
-  useEffect(() => fetchDocuments(), [startDate, endDate, selectedEnv]);
+  useEffect(() => fetchDocuments(), [startDate, endDate, selectedEnv, selectedOption]);
   return (
     <>
       {!accessToken ? (
@@ -74,8 +78,8 @@ const ApplicationsPage = () => {
             data={documents}
             search={false}
             app={true}
-            // lienthong={false}
-            // title="Thống kê "
+            lienthong={false}
+          // title="Thống kê "
           />
         </DefaultLayout>
       )}

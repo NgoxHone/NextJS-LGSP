@@ -113,19 +113,24 @@ const ChatCard = ({ height }) => {
         >
           <div className="mr-2">
             {optionData != null && (
-              <SelectGroupTwo
-                onSelect={handleSelectAppChange}
-                label=""
-                options={[
-                  { value: "Tất cả", label: "Tất cả" },
-                  ...(
-                    optionDataApp?.aggregations?.group_by_api?.buckets ?? []
-                  ).map((i) => ({
-                    value: i.key,
-                    label: i.key,
-                  })),
-                ]}
-              />
+              <>
+                <label style={{ fontFamily: 'sans-serif' }}>Phần mềm</label>
+
+                <SelectGroupTwo
+                
+                  onSelect={handleSelectAppChange}
+                  label=""
+                  options={[
+                    { value: "Tất cả", label: "Tất cả" },
+                    ...(
+                      optionDataApp?.aggregations?.group_by_api?.buckets ?? []
+                    ).map((i) => ({
+                      value: i.key,
+                      label: i.key,
+                    })),
+                  ]}
+                />
+              </>
             )}
           </div>
 

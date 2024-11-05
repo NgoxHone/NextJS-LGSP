@@ -16,12 +16,14 @@ import { useRouter } from "next/navigation";
 import {
   convertDateToMilliseconds,
   fetchData,
+  fetchData2,
   getTimestampRanges,
 } from "../../../utilities/GlobalFunction";
 import {
   bodyGetEdoc,
   bodySendEdoc,
   data1,
+  dataMM,
   TotalDV,
   TotalPN,
   TotalRequest,
@@ -147,12 +149,72 @@ const ECommerce = () => {
     convertDateToMilliseconds(getTodayDate()),
   );
 
-  const fetchDocuments = () => {
+  const fetchDocuments = async () => {
     setLoading(true);
-    fetchData(data1(startDate, endDate, selectedEnv, selectedOptionApp), setDocuments).finally(
-      () => setLoading(false),
-    );
+    try {
+      // Call the first API and get the response
+      const response1 = await fetchData2(data1(startDate, endDate, selectedEnv, selectedOptionApp), null);
+
+      // Call the second API and get the response
+      const response2 = await fetchData2(dataMM(startDate, endDate, selectedEnv, selectedOptionApp), null);
+
+      // Function to map unique_correlation_count from api2Data into api1Data
+      const mapCorrelationCounts = (api1Data, api2Data) => {
+        const api1Buckets = api1Data.aggregations.group_by_api.buckets;
+        const api2Buckets = api2Data.aggregations.group_by_api.buckets;
+
+        // Create a map for api2Data based on keys and unique_correlation_count
+        const api2Map = new Map();
+
+        // Populate the map with keys and unique_correlation_count
+        api2Buckets.forEach(bucket => {
+          api2Map.set(bucket.key, bucket.unique_correlation_count.value);
+        });
+
+        // Map the unique_correlation_count from api2Data into api1Data
+        const updatedApi1Buckets = api1Buckets.map(bucket => {
+          const correlationCount = api2Map.get(bucket.key) || 0; // Default to 0 if no match
+          return {
+            ...bucket,
+            unique_correlation_count: {
+              ...bucket.unique_correlation_count,
+              value: correlationCount // Update the unique_correlation_count
+            }
+          };
+        });
+
+        // Return the updated structure
+        return {
+          ...api1Data,
+          aggregations: {
+            ...api1Data.aggregations,
+            group_by_api: {
+              ...api1Data.aggregations.group_by_api,
+              buckets: updatedApi1Buckets // Updated buckets
+            }
+          }
+        };
+      };
+
+      // Map the correlation counts
+      const updatedApi1Data = mapCorrelationCounts(response1, response2);
+
+      // Combine the results
+      // const combinedResponse = {
+      //   api1Data: updatedApi1Data,
+      //   api2Data: response2,
+      // };
+
+      // Set the combined response to state
+      setDocuments(updatedApi1Data); // Adjust the state update as needed based on your application
+    } catch (error) {
+      console.error("Error during fetchDocuments:", error);
+    } finally {
+      // setLoading(false); // Ensure loading is set to false regardless of success or error
+    }
   };
+
+
 
   const fetchTotalRequest = () => {
     fetchData(TotalRequest(selectedEnv), (dataRes) => setTotal(dataRes?.count));
@@ -166,7 +228,7 @@ const ECommerce = () => {
 
   const fetchTotalAPI = () => {
     fetchData(TotalDV(selectedEnv), (dataRes) =>
-      setTotalAPI(dataRes?.aggregations?.application_name_count?.value - 1),
+      setTotalAPI(dataRes?.aggregations?.application_name_count?.value),
     );
   };
 
@@ -204,7 +266,7 @@ const ECommerce = () => {
   useEffect(() => {
     console.log("goi ham");
     fetchDocuments();
-  }, [startDate, endDate, selectedEnv,selectedOptionApp]);
+  }, [startDate, endDate, selectedEnv, selectedOptionApp]);
 
   useEffect(() => {
     fetchTotalGetEdoc();
@@ -219,7 +281,7 @@ const ECommerce = () => {
   }, [selectedEnv]);
 
 
-  console.log("dokument11", data1(startDate, endDate, selectedEnv, selectedOptionApp));
+  console.log("dokument11", documents);
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
