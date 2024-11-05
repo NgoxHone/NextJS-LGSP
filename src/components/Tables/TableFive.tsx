@@ -12,6 +12,7 @@ const Table = ({
   title = "",
   lienthong = true,
   app = false,
+  loading = false
 }) => {
   const { aggregations } = data;
   const getTodayDate = () => {
@@ -157,7 +158,7 @@ const Table = ({
           </button>
         )}
       </div>
-      <div className="mt-6">
+      {!loading ? <div className="mt-6">
         <table className="mb-10 min-w-full table-auto">
           <thead style={{ backgroundColor: "#f3f4f6", borderRadius: 20 }}>
             <tr className="bg-gray-200 text-gray-600 border-gray-300 round-lg text-sm uppercase leading-normal">
@@ -256,7 +257,7 @@ const Table = ({
             </a>
           </div>
         )}
-      </div>
+      </div> : <p>Đang tải...</p>}
     </div>
   );
 };

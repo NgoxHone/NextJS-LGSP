@@ -49,7 +49,7 @@ const getTodayDate = () => {
 const getLastMonthDate = () => {
   const lastMonth = new Date();
   lastMonth.setMonth(lastMonth.getMonth() - 1);
-  return lastMonth.toISOString().split("T")[0];
+  return null;
 };
 
 const ECommerce = () => {
@@ -225,9 +225,9 @@ const ECommerce = () => {
         <CardDataStats
           title="Request"
           total={Total.toLocaleString("de-DE")}
-          // rate="0.43%"
+        // rate="0.43%"
 
-          // levelUp
+        // levelUp
         >
           <svg
             className="fill-primary dark:fill-white"
@@ -251,7 +251,7 @@ const ECommerce = () => {
           click={() => router.push("/services")}
           title="Dịch vụ"
           total={TotalAPI}
-          // rate="4.35%" levelUp
+        // rate="4.35%" levelUp
         >
           <svg
             viewBox="0 0 512 512"
@@ -359,14 +359,13 @@ const ECommerce = () => {
       <div className="mt-4 flex flex-col gap-4 md:mt-6 md:gap-6 xl:flex-row 2xl:mt-7.5 2xl:gap-7.5">
         <div ref={divRef} className="flex w-full flex-col xl:w-2/3">
           <div className="flex-grow">
-            {!loading && (
-              <TableFive
-                onStartDateChange={handleStartDateChange}
-                onEndDateChange={handleEndDateChange}
-                data={documents}
-                search={false}
-              />
-            )}
+            <TableFive
+              loading={loading}
+              onStartDateChange={handleStartDateChange}
+              onEndDateChange={handleEndDateChange}
+              data={documents}
+              search={false}
+            />
           </div>
           {/* <div className="mt-8 w-full">
             <Calendar />
