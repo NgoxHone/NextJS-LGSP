@@ -411,11 +411,16 @@ const Table = ({
         </table>
 
         {(filteredData?.length == 0 || !filteredData) && (
-          <div className="mb-10 w-full" style={{ alignSelf: "center" }}>
+          data?.init ? <div className="mb-10 w-full" style={{ alignSelf: "center" }}>
             <a style={{ textAlign: "center", color: "gray" }}>
-              Không tìm thấy dữ liệu
+              Đang tải...
             </a>
-          </div>
+          </div> :
+            <div className="mb-10 w-full" style={{ alignSelf: "center" }}>
+              <a style={{ textAlign: "center", color: "gray" }}>
+                Không tìm thấy dữ liệu
+              </a>
+            </div>
         )}
       </div> : <p>Đang tải...</p>}
     </div>

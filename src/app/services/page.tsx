@@ -22,7 +22,7 @@ const TableFive = dynamic(() => import("@/components/Tables/TableFive"), {
 const { today, yesterday } = getTimestampRanges();
 const getTodayDate = () => {
   const today = new Date();
-  return today.toISOString().split("T")[0];
+  return null
 };
 
 const getLastMonthDate = () => {
@@ -34,11 +34,13 @@ const ServicesPage = () => {
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [documents, setDocuments] = useState(data);
   const [accessToken] = useRecoilState(accessTokenState);
+  const [loading, setLoading] = useState(true);
+
   const [endDate, setEndDate] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
   const [startDate, setStartDate] = useState(
-    convertDateToMilliseconds(getLastMonthDate()),
+    null
   );
   const handleStartDateChange = (date) => {
     setStartDate(convertDateToMilliseconds(date));
@@ -48,29 +50,30 @@ const ServicesPage = () => {
     setEndDate(convertDateToMilliseconds(date));
   };
   const fetchDocuments = () => {
-    // setLoading(true);
-    fetchData(data1(startDate, endDate,selectedEnv), setDocuments).finally(
-      () => {},
-      //   setLoading(false),
+    setLoading(true);
+    fetchData(data1(startDate, endDate, selectedEnv), setDocuments).finally(
+      () => { },
+        setLoading(false),
     );
   };
-  useEffect(() => fetchDocuments(), [startDate,endDate,selectedEnv]);
+  useEffect(() => fetchDocuments(), [startDate, endDate, selectedEnv]);
   return (
     <>
       {!accessToken ? (
         <SignIn />
       ) : (
         <DefaultLayout>
-        <Breadcrumb pageName="Dịch vụ" />
+          <Breadcrumb pageName="Dịch vụ" />
 
           <TableFive
             // xuatEx={false}
+            loading={loading}
             onStartDateChange={handleStartDateChange}
             onEndDateChange={handleEndDateChange}
             data={documents}
             search={false}
-            // lienthong={false}
-            // title="Thống kê gửi nhận văn bản"
+          // lienthong={false}
+          // title="Thống kê gửi nhận văn bản"
           />
         </DefaultLayout>
       )}

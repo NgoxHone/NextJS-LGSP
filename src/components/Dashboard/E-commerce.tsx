@@ -35,6 +35,7 @@ import {
 import Calendar from "../Calender";
 import { useRecoilState } from "recoil";
 import { matchingCountState, optionEnviroment, optionOptionApp } from "../../../utilities/Atom/atom";
+import { tr } from "date-fns/locale";
 
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
@@ -57,14 +58,14 @@ const getLastMonthDate = () => {
 
 const ECommerce = () => {
   const router = useRouter();
-  const [selectedOptionApp] = useRecoilState(optionOptionApp);
-  const [selectedEnv] = useRecoilState(optionEnviroment);
-  const [documents, setDocuments] = useState(data);
-  const [loading, setLoading] = useState(false);
   const [Total, setTotal] = useState(0);
   const [TotalPNs, setTotalPN] = useState(0);
   const [TotalAPI, setTotalAPI] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [TotalAPIToday, setTotalAPIToday] = useState(0);
+  const [documents, setDocuments] = useState(data);
+  const [selectedEnv] = useRecoilState(optionEnviroment);
+  const [selectedOptionApp] = useRecoilState(optionOptionApp);
   const [dataSentEdoc, setDataSentEdoc] = useState({
     aggregations: {
       group_by_api: {
@@ -81,6 +82,10 @@ const ECommerce = () => {
       },
     },
   });
+  const [correlationIds, setCorrelationIds] = useState([]);
+  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
+
+
   function calculatePercentageChange(today, yesterday) {
     if (!today) return;
     return (
@@ -142,7 +147,7 @@ const ECommerce = () => {
   const [endDate, setEndDate] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
-  const [loading2, setLoading2] = useState(false);
+  const [loading2, setLoading2] = useState(true);
   const [startDate2, setStartDate2] = useState(
     null
   );
@@ -281,8 +286,7 @@ const ECommerce = () => {
     fetchTotalAPIToday();
   }, [selectedEnv]);
 
-  const [correlationIds, setCorrelationIds] = useState([]);
-  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState); // Sử dụng Recoil state
+
   useEffect(() => {
     const fetchCorrelationIds = async () => {
       const filters = [];

@@ -15,15 +15,12 @@ const data = {
     max_score: null,
     hits: [],
   },
+  init: true,
   aggregations: {
     group_by_api: {
       doc_count_error_upper_bound: 0,
       sum_other_doc_count: 0,
       buckets: [
-        // {
-        //   key: "HTTTNTW",
-        //   doc_count: null,
-        // },
         // {
         //   key: "PHANANH_CAMAU",
         //   doc_count: 0,
