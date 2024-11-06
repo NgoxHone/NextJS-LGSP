@@ -22,7 +22,7 @@ const data = {
       buckets: [
         // {
         //   key: "HTTTNTW",
-        //   doc_count: 0,
+        //   doc_count: null,
         // },
         // {
         //   key: "PHANANH_CAMAU",

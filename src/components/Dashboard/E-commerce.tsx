@@ -14,9 +14,12 @@ import TableFour from "../Tables/TableFour";
 import TableFive from "../Tables/TableFive";
 import { useRouter } from "next/navigation";
 import {
+  checkResponses,
   convertDateToMilliseconds,
+  fetchAllCorrelationIds,
   fetchData,
   fetchData2,
+  fetchData3,
   getTimestampRanges,
 } from "../../../utilities/GlobalFunction";
 import {
@@ -31,7 +34,7 @@ import {
 } from "./body";
 import Calendar from "../Calender";
 import { useRecoilState } from "recoil";
-import { optionEnviroment, optionOptionApp } from "../../../utilities/Atom/atom";
+import { matchingCountState, optionEnviroment, optionOptionApp } from "../../../utilities/Atom/atom";
 
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
   ssr: false,
@@ -49,8 +52,6 @@ const getTodayDate = () => {
 };
 
 const getLastMonthDate = () => {
-  const lastMonth = new Date();
-  lastMonth.setMonth(lastMonth.getMonth() - 1);
   return null;
 };
 
@@ -136,14 +137,14 @@ const ECommerce = () => {
   };
 
   const [startDate, setStartDate] = useState(
-    convertDateToMilliseconds(getLastMonthDate()),
+    null
   );
   const [endDate, setEndDate] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
-
+  const [loading2, setLoading2] = useState(false);
   const [startDate2, setStartDate2] = useState(
-    convertDateToMilliseconds(getLastMonthDate()),
+    null
   );
   const [endDate2, setEndDate2] = useState(
     convertDateToMilliseconds(getTodayDate()),
@@ -210,7 +211,7 @@ const ECommerce = () => {
     } catch (error) {
       console.error("Error during fetchDocuments:", error);
     } finally {
-      // setLoading(false); // Ensure loading is set to false regardless of success or error
+      setLoading(false); // Ensure loading is set to false regardless of success or error
     }
   };
 
@@ -280,8 +281,111 @@ const ECommerce = () => {
     fetchTotalAPIToday();
   }, [selectedEnv]);
 
+  const [correlationIds, setCorrelationIds] = useState([]);
+  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState); // Sử dụng Recoil state
+  useEffect(() => {
+    const fetchCorrelationIds = async () => {
+      const filters = [];
 
-  console.log("dokument11", documents);
+      // Check if start and end are not null and add range condition to filters
+      if (startDate2 && endDate2) {
+        filters.push({
+          range: {
+            date_created: {
+              gt: startDate2,
+              lt: endDate2,
+            },
+          },
+        });
+      }
+      setLoading2(true);
+      try {
+        const requestData = {
+          index: 'apim-request-index/_search',
+          body: {
+            "query": {
+              "bool": {
+                filter: filters,
+                "must": [
+                  { "match": { "full_request_path": "/vdxp-product/1.0/sendEdoc" } },
+                  { "wildcard": { "headers": "*=edoc*" } }
+                ]
+              }
+            },
+            "aggs": {
+              "correlation_ids": {
+                "composite": {
+                  "size": 20000,
+                  "sources": [
+                    { "correlation_id": { "terms": { "field": "correlation_id" } } }
+                  ]
+                }
+              }
+            }
+          }
+        };
+
+        // Gọi API và lưu correlationIds
+        const ids = await fetchData3(requestData, null, '/api/service');
+        setCorrelationIds(ids);
+      } catch (err) {
+        console.error("Failed to fetch correlation IDs", err);
+        // setError("Failed to fetch data");
+      } finally {
+        // setLoading2(false);
+      }
+    };
+
+    fetchCorrelationIds();
+  }, [startDate2, endDate2]);
+  useEffect(() => {
+    const fetchMatchingResponses = async () => {
+
+      setLoading2(true);
+      try {
+        const requestData = {
+          index: 'apim-response-index/_search',
+          body: {
+            size: 0,
+            query: {
+              terms: {
+                correlation_id: correlationIds, // Truyền danh sách correlation_id
+              },
+
+            },
+            aggs: {
+              unique_correlation_ids: {
+                cardinality: {
+                  field: "correlation_id", // Đếm các correlation_id duy nhất
+                },
+              },
+            },
+          }
+        };
+
+        // Gọi API trực tiếp
+        const response = await axios.post("/api/service", requestData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        // Lấy số lượng correlation_id duy nhất từ Elasticsearch
+        const count = response.data.aggregations?.unique_correlation_ids?.value || 0;
+        setMatchingCount(count);
+      } catch (err) {
+        console.error("Failed to check responses", err);
+        // setError("Failed to fetch response data");
+      } finally {
+        setLoading2(false);
+      }
+    };
+
+    if (correlationIds.length > 0) {
+      fetchMatchingResponses();
+    }
+  }, [correlationIds]);
+  console.log("zxczxc", correlationIds)
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
@@ -440,6 +544,7 @@ const ECommerce = () => {
           className="flex w-full flex-col xl:w-1/3"
         >
           <TableFive
+            loading={loading2}
             xuatEx={false}
             onStartDateChange={handleStartDateChange2}
             onEndDateChange={handleEndDateChange2}

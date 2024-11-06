@@ -30,3 +30,7 @@ export const optionOption = atom<string | null>({
   key: "optionOptionApp",
   default: null,
 });
+export const matchingCountState = atom({
+  key: 'matchingCountState', // Mỗi atom phải có một key duy nhất
+  default: 0, // Giá trị mặc định ban đầu
+});

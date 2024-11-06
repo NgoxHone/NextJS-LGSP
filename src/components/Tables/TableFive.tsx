@@ -6,7 +6,7 @@ import { getDatabaseDescription } from "../../../utilities/GlobalFunction";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
 import axios from "axios";
 import { dataOption, dataOptionApp } from "../Chat/body";
-import { optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
+import { matchingCountState, optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
 import { useRecoilState } from "recoil";
 const Table = ({
   data,
@@ -30,6 +30,7 @@ const Table = ({
     lastMonth.setFullYear(lastMonth.getFullYear() - 1);
     return lastMonth.toISOString().split("T")[0];
   };
+  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp, setSelectedOptionApp] = useRecoilState(optionOptionApp);
   const [selectedOption, setSelectedOption] = useRecoilState(optionOption);
@@ -267,7 +268,7 @@ const Table = ({
                 </th>
               )}
 
-              <th className="w-[70%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
+              <th className={!lienthong ? "w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base" : "w-[50%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base"}>
                 {app ? "Phần mềm" : "Dịch vụ"}
               </th>
 
@@ -313,12 +314,24 @@ const Table = ({
                   </td>
                   <td
                     style={{ fontWeight: "bold" }}
-                    className="px-6 py-3 text-left"
+                    className={"px-6 py-3 text-left"}
                   >
                     {/* {!lienthong
                       ? bucket?.doc_count?.toLocaleString()
                       : bucket?.unique_correlation_count?.value?.toLocaleString()} */}
                     {bucket?.doc_count?.toLocaleString()}
+                    {!lienthong && index == 0 && matchingCount != 0 && !loading && <>
+
+
+                      <p style={{ fontSize: 13 }}>
+                        {matchingCount.toLocaleString()} ({Math.round((matchingCount / bucket?.doc_count) * 100).toLocaleString() + "%"}) thành công
+                      </p>
+                      <p style={{ fontSize: 13 }}>
+                        {(bucket?.doc_count - matchingCount).toLocaleString()} ({Math.round(((bucket?.doc_count - matchingCount) / bucket?.doc_count) * 100).toLocaleString() + "%"}) thất bại
+                      </p>
+
+                    </>
+                    }
                   </td>
                   {lienthong && !app && (
                     <>

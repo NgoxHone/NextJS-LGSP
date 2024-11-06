@@ -5,7 +5,13 @@ interface ElasticsearchErrorResponse {
   message: string;
   status?: number;
 }
-
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb' // Tăng kích thước giới hạn lên 10MB hoặc tùy chỉnh theo nhu cầu
+    }
+  }
+};
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { index, body } = req.body;
 
@@ -24,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Gửi phản hồi JSON thành công
     res.status(200).json(response.data);
+    console.log("==---->",body)
   } catch (error) {
     console.error("Elasticsearch Axios Error:", error);
 

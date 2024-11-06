@@ -93,6 +93,39 @@ export const fetchData2 = async (data, setState, path = "/api/service") => {
     throw error; // Optionally rethrow the error for handling in the caller function
   }
 };
+export const fetchData3 = async (data, setState, path = "/api/service") => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: path,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    });
+
+    // Kiểm tra cấu trúc dữ liệu trả về từ Elasticsearch
+    const dataRes = response.data;
+    console.log("Elasticsearch Response Data:", dataRes);
+
+    // Trích xuất correlation_id từ buckets nếu dữ liệu trả về đúng cấu trúc
+    const correlationIds = dataRes.aggregations?.correlation_ids?.buckets.map(
+      (bucket) => bucket.key.correlation_id,
+    );
+
+    // Cập nhật state nếu setState được cung cấp
+    if (setState) {
+      setState(correlationIds);
+    }
+
+    // Trả về danh sách correlation_id
+    return correlationIds;
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    throw error;
+  }
+};
+
 export function getDatabaseDescription(id) {
   switch (id) {
     case 1:
@@ -199,5 +232,106 @@ export const decodeJWT = () => {
   } catch (error) {
     console.error("Error decoding token:", error);
     return null;
+  }
+};
+
+export async function fetchAllCorrelationIds() {
+  const correlationIds = [];
+  let afterKey = null;
+
+  try {
+    while (true) {
+      const query = {
+        index: "/apim-request-index/_search",
+        body: {
+          size: 0,
+          query: {
+            bool: {
+              must: [
+                { match: { full_request_path: "/vdxp-product/1.0/getEdoc" } },
+              ],
+            },
+          },
+          aggs: {
+            correlation_ids: {
+              composite: {
+                size: 1000,
+                sources: [
+                  { correlation_id: { terms: { field: "correlation_id" } } },
+                ],
+                ...(afterKey ? { after: afterKey } : {}), // Thêm `afterKey` nếu có
+              },
+            },
+          },
+        },
+      };
+
+      const response = await axios({
+        method: "post",
+        url: "/api/service",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: query,
+      });
+
+      const buckets = response.data.aggregations.correlation_ids.buckets;
+
+      // Lưu correlation_id vào mảng
+      buckets.forEach((bucket) => {
+        correlationIds.push(bucket.key.correlation_id);
+      });
+
+      // Kiểm tra `after_key` để xác định nếu có trang tiếp theo
+      afterKey = response.data.aggregations.correlation_ids.after_key;
+
+      // Nếu không có `after_key`, thoát khỏi vòng lặp
+      if (!afterKey) break;
+    }
+
+    return correlationIds;
+  } catch (error) {
+    console.error("Error fetching correlation IDs:", error);
+    return [];
+  }
+}
+
+export const checkResponses = async (correlationIds) => {
+  try {
+    const requestData = {
+      index: "/apim-response-index/_search",
+      body: {
+        size: 0,
+        query: {
+          terms: {
+            correlation_id: correlationIds,
+          },
+        },
+        aggs: {
+          unique_correlation_ids: {
+            cardinality: {
+              field: "correlation_id",
+            },
+          },
+        },
+      },
+    };
+    console.log("BODY", requestData);
+    // Gọi API để kiểm tra correlation_id trong response
+    const response = await axios({
+      method: "post",
+      url: "/api/service",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: requestData,
+    });
+
+    // Trả về số lượng correlation_id có mặt trong response
+    console.log("CUISCUNG", response);
+    return response.data.aggregations.unique_correlation_ids.value;
+  } catch (error) {
+    console.error("Error fetching response documents:", error);
+    throw error;
   }
 };
