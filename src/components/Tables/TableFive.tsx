@@ -27,17 +27,18 @@ const Table = ({
 
   const getLastMonthDate = () => {
     const lastMonth = new Date();
-    lastMonth.setFullYear(lastMonth.getFullYear() - 1);
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
     return lastMonth.toISOString().split("T")[0];
   };
+  
   const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp, setSelectedOptionApp] = useRecoilState(optionOptionApp);
   const [selectedOption, setSelectedOption] = useRecoilState(optionOption);
   const [optionDataApp, setOptionDataApp] = useState([]);
   const [optionData, setOptionData] = useRecoilState(optionService);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(getLastMonthDate);
+  const [endDate, setEndDate] = useState(getTodayDate);
   const [searchTerm, setSearchTerm] = useState("");
   console.log("Today==>", getTodayDate());
   const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debouncing 500ms

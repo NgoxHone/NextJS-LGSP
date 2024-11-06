@@ -148,6 +148,83 @@ export function dataMM(start, end, selectedEnv, app) {
     },
   };
 }
+
+export function dataCombined(start, end, selectedEnv, app) {
+  const filters = [];
+
+  // Kiểm tra start và end và thêm điều kiện range vào filters
+  if (start) {
+    filters.push({
+      range: {
+        date_created: {
+          gt: start,
+          lt: end,
+        },
+      },
+    });
+  }
+
+  // Nếu selectedEnv không phải "ALL", thêm điều kiện vào filters
+  if (selectedEnv && selectedEnv !== "ALL") {
+    filters.push({
+      term: {
+        am_key_type: selectedEnv,
+      },
+    });
+  }
+
+  // Nếu app được cung cấp, thêm điều kiện vào filters
+  if (app && app !== "Tất cả") {
+    filters.push({
+      term: {
+        application_name: app,
+      },
+    });
+  }
+
+  return {
+    index: "apim-request-index,apim-response-index", // Sử dụng mảng để truy vấn trên cả hai chỉ mục
+    body: {
+      size: 0,
+      query: {
+        bool: {
+          filter: filters,
+        },
+      },
+      aggs: {
+        group_by_api: {
+          terms: {
+            field: "api",
+            size: 50,
+            exclude: ["null"],
+          },
+          aggs: {
+            unique_correlation_count: {
+              cardinality: {
+                field: "correlation_id",
+              },
+            },
+            by_failure: {
+              filter: {
+                term: {
+                  isSuccess: false,
+                },
+              },
+              aggs: {
+                unique_failure_count: {
+                  cardinality: {
+                    field: "correlation_id",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+}
+
 export const TotalRequest = (selectedEnv) => {
   const filter = [];
   if (selectedEnv && selectedEnv !== "ALL") {

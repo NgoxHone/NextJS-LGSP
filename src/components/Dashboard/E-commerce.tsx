@@ -34,7 +34,11 @@ import {
 } from "./body";
 import Calendar from "../Calender";
 import { useRecoilState } from "recoil";
-import { matchingCountState, optionEnviroment, optionOptionApp } from "../../../utilities/Atom/atom";
+import {
+  matchingCountState,
+  optionEnviroment,
+  optionOptionApp,
+} from "../../../utilities/Atom/atom";
 import { tr } from "date-fns/locale";
 
 const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
@@ -53,9 +57,11 @@ const getTodayDate = () => {
 };
 
 const getLastMonthDate = () => {
-  return null;
+  const lastMonth = new Date();
+  lastMonth.setMonth(lastMonth.getMonth() - 1);
+  lastMonth.setHours(0, 0, 0, 0); // Đặt giờ về 0 để có timestamp bắt đầu ngày
+  return lastMonth.getTime();
 };
-
 const ECommerce = () => {
   const router = useRouter();
   const [Total, setTotal] = useState(0);
@@ -84,7 +90,6 @@ const ECommerce = () => {
   });
   const [correlationIds, setCorrelationIds] = useState([]);
   const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
-
 
   function calculatePercentageChange(today, yesterday) {
     if (!today) return;
@@ -141,16 +146,12 @@ const ECommerce = () => {
     });
   };
 
-  const [startDate, setStartDate] = useState(
-    null
-  );
+  const [startDate, setStartDate] = useState(getLastMonthDate());
   const [endDate, setEndDate] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
   const [loading2, setLoading2] = useState(true);
-  const [startDate2, setStartDate2] = useState(
-    null
-  );
+  const [startDate2, setStartDate2] = useState(getLastMonthDate());
   const [endDate2, setEndDate2] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
@@ -159,10 +160,16 @@ const ECommerce = () => {
     setLoading(true);
     try {
       // Call the first API and get the response
-      const response1 = await fetchData2(data1(startDate, endDate, selectedEnv, selectedOptionApp), null);
+      const response1 = await fetchData2(
+        data1(startDate, endDate, selectedEnv, selectedOptionApp),
+        null,
+      );
 
       // Call the second API and get the response
-      const response2 = await fetchData2(dataMM(startDate, endDate, selectedEnv, selectedOptionApp), null);
+      const response2 = await fetchData2(
+        dataMM(startDate, endDate, selectedEnv, selectedOptionApp),
+        null,
+      );
 
       // Function to map unique_correlation_count from api2Data into api1Data
       const mapCorrelationCounts = (api1Data, api2Data) => {
@@ -173,19 +180,19 @@ const ECommerce = () => {
         const api2Map = new Map();
 
         // Populate the map with keys and unique_correlation_count
-        api2Buckets.forEach(bucket => {
+        api2Buckets.forEach((bucket) => {
           api2Map.set(bucket.key, bucket.unique_correlation_count.value);
         });
 
         // Map the unique_correlation_count from api2Data into api1Data
-        const updatedApi1Buckets = api1Buckets.map(bucket => {
+        const updatedApi1Buckets = api1Buckets.map((bucket) => {
           const correlationCount = api2Map.get(bucket.key) || 0; // Default to 0 if no match
           return {
             ...bucket,
             unique_correlation_count: {
               ...bucket.unique_correlation_count,
-              value: correlationCount // Update the unique_correlation_count
-            }
+              value: correlationCount, // Update the unique_correlation_count
+            },
           };
         });
 
@@ -196,9 +203,9 @@ const ECommerce = () => {
             ...api1Data.aggregations,
             group_by_api: {
               ...api1Data.aggregations.group_by_api,
-              buckets: updatedApi1Buckets // Updated buckets
-            }
-          }
+              buckets: updatedApi1Buckets, // Updated buckets
+            },
+          },
         };
       };
 
@@ -219,8 +226,6 @@ const ECommerce = () => {
       setLoading(false); // Ensure loading is set to false regardless of success or error
     }
   };
-
-
 
   const fetchTotalRequest = () => {
     fetchData(TotalRequest(selectedEnv), (dataRes) => setTotal(dataRes?.count));
@@ -286,7 +291,6 @@ const ECommerce = () => {
     fetchTotalAPIToday();
   }, [selectedEnv]);
 
-
   useEffect(() => {
     const fetchCorrelationIds = async () => {
       const filters = [];
@@ -305,32 +309,34 @@ const ECommerce = () => {
       setLoading2(true);
       try {
         const requestData = {
-          index: 'apim-request-index/_search',
+          index: "apim-request-index/_search",
           body: {
-            "query": {
-              "bool": {
+            query: {
+              bool: {
                 filter: filters,
-                "must": [
-                  { "match": { "full_request_path": "/vdxp-product/1.0/sendEdoc" } },
-                  { "wildcard": { "headers": "*=edoc*" } }
-                ]
-              }
+                must: [
+                  {
+                    match: { full_request_path: "/vdxp-product/1.0/sendEdoc" },
+                  },
+                  { wildcard: { headers: "*=edoc*" } },
+                ],
+              },
             },
-            "aggs": {
-              "correlation_ids": {
-                "composite": {
-                  "size": 20000,
-                  "sources": [
-                    { "correlation_id": { "terms": { "field": "correlation_id" } } }
-                  ]
-                }
-              }
-            }
-          }
+            aggs: {
+              correlation_ids: {
+                composite: {
+                  size: 20000,
+                  sources: [
+                    { correlation_id: { terms: { field: "correlation_id" } } },
+                  ],
+                },
+              },
+            },
+          },
         };
 
         // Gọi API và lưu correlationIds
-        const ids = await fetchData3(requestData, null, '/api/service');
+        const ids = await fetchData3(requestData, null, "/api/service");
         setCorrelationIds(ids);
       } catch (err) {
         console.error("Failed to fetch correlation IDs", err);
@@ -344,18 +350,16 @@ const ECommerce = () => {
   }, [startDate2, endDate2]);
   useEffect(() => {
     const fetchMatchingResponses = async () => {
-
       setLoading2(true);
       try {
         const requestData = {
-          index: 'apim-response-index/_search',
+          index: "apim-response-index/_search",
           body: {
             size: 0,
             query: {
               terms: {
                 correlation_id: correlationIds, // Truyền danh sách correlation_id
               },
-
             },
             aggs: {
               unique_correlation_ids: {
@@ -364,7 +368,7 @@ const ECommerce = () => {
                 },
               },
             },
-          }
+          },
         };
 
         // Gọi API trực tiếp
@@ -375,7 +379,8 @@ const ECommerce = () => {
         });
 
         // Lấy số lượng correlation_id duy nhất từ Elasticsearch
-        const count = response.data.aggregations?.unique_correlation_ids?.value || 0;
+        const count =
+          response.data.aggregations?.unique_correlation_ids?.value || 0;
         setMatchingCount(count);
       } catch (err) {
         console.error("Failed to check responses", err);
@@ -389,16 +394,16 @@ const ECommerce = () => {
       fetchMatchingResponses();
     }
   }, [correlationIds]);
-  console.log("zxczxc", correlationIds)
+  console.log("startDay", startDate);
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardDataStats
           title="Request"
           total={Total.toLocaleString("de-DE")}
-        // rate="0.43%"
+          // rate="0.43%"
 
-        // levelUp
+          // levelUp
         >
           <svg
             className="fill-primary dark:fill-white"
@@ -422,7 +427,7 @@ const ECommerce = () => {
           click={() => router.push("/services")}
           title="Dịch vụ"
           total={TotalAPI}
-        // rate="4.35%" levelUp
+          // rate="4.35%" levelUp
         >
           <svg
             viewBox="0 0 512 512"
