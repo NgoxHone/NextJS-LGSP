@@ -39,15 +39,6 @@ import {
   optionEnviroment,
   optionOptionApp,
 } from "../../../utilities/Atom/atom";
-import { tr } from "date-fns/locale";
-
-const MapOne = dynamic(() => import("@/components/Maps/MapOne"), {
-  ssr: false,
-});
-
-const ChartThree = dynamic(() => import("@/components/Charts/ChartThree"), {
-  ssr: false,
-});
 const { today, yesterday } = getTimestampRanges();
 
 const getTodayDate = () => {
@@ -62,6 +53,17 @@ const getLastMonthDate = () => {
   lastMonth.setHours(0, 0, 0, 0); // Đặt giờ về 0 để có timestamp bắt đầu ngày
   return lastMonth.getTime();
 };
+
+const isLevelUp = (today, yesterday) => today > yesterday;
+const isLevelDown = (today, yesterday) => today < yesterday;
+const calculatePercentageChange = (today, yesterday) => {
+  if (!today) return;
+  return (
+    (Math.round(((today - yesterday) / yesterday) * 10000) / 100).toFixed(2) +
+    "%"
+  );
+};
+
 const ECommerce = () => {
   const router = useRouter();
   const [Total, setTotal] = useState(0);
@@ -72,6 +74,18 @@ const ECommerce = () => {
   const [documents, setDocuments] = useState(data);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp] = useRecoilState(optionOptionApp);
+
+  const [correlationIds, setCorrelationIds] = useState([]);
+  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
+  const [loadingEdoc, setLoadingEdoc] = useState(true);
+  const [startDate, setStartDate] = useState(getLastMonthDate());
+  const [endDate, setEndDate] = useState(
+    convertDateToMilliseconds(getTodayDate()),
+  );
+  const [startDateEdoc, setStartDateEdoc] = useState(getLastMonthDate());
+  const [endDate2, setEndDateEdoc] = useState(
+    convertDateToMilliseconds(getTodayDate()),
+  );
   const [dataSentEdoc, setDataSentEdoc] = useState({
     aggregations: {
       group_by_api: {
@@ -88,39 +102,19 @@ const ECommerce = () => {
       },
     },
   });
-  const [correlationIds, setCorrelationIds] = useState([]);
-  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
 
-  function calculatePercentageChange(today, yesterday) {
-    if (!today) return;
-    return (
-      (Math.round(((today - yesterday) / yesterday) * 10000) / 100).toFixed(2) +
-      "%"
-    );
-  }
-
-  function isLevelUp(today, yesterday) {
-    return today > yesterday;
-  }
-
-  function isLevelDown(today, yesterday) {
-    return today < yesterday;
-  }
-
+  //functionHandle
   const handleStartDateChange = (date) => {
     setStartDate(convertDateToMilliseconds(date));
   };
-
   const handleEndDateChange = (date) => {
     setEndDate(convertDateToMilliseconds(date));
   };
-
   const handleStartDateChange2 = (date) => {
-    setStartDate2(convertDateToMilliseconds(date));
+    setStartDateEdoc(convertDateToMilliseconds(date));
   };
-
   const handleEndDateChange2 = (date) => {
-    setEndDate2(convertDateToMilliseconds(date));
+    setEndDateEdoc(convertDateToMilliseconds(date));
   };
   const updateSentEdocCount = (newCount, type) => {
     setDataSentEdoc((prevState) => {
@@ -145,58 +139,37 @@ const ECommerce = () => {
       };
     });
   };
-
-  const [startDate, setStartDate] = useState(getLastMonthDate());
-  const [endDate, setEndDate] = useState(
-    convertDateToMilliseconds(getTodayDate()),
-  );
-  const [loading2, setLoading2] = useState(true);
-  const [startDate2, setStartDate2] = useState(getLastMonthDate());
-  const [endDate2, setEndDate2] = useState(
-    convertDateToMilliseconds(getTodayDate()),
-  );
-
   const fetchDocuments = async () => {
     setLoading(true);
     try {
-      // Call the first API and get the response
       const response1 = await fetchData2(
         data1(startDate, endDate, selectedEnv, selectedOptionApp),
         null,
       );
 
-      // Call the second API and get the response
       const response2 = await fetchData2(
         dataMM(startDate, endDate, selectedEnv, selectedOptionApp),
         null,
       );
 
-      // Function to map unique_correlation_count from api2Data into api1Data
       const mapCorrelationCounts = (api1Data, api2Data) => {
         const api1Buckets = api1Data.aggregations.group_by_api.buckets;
         const api2Buckets = api2Data.aggregations.group_by_api.buckets;
-
-        // Create a map for api2Data based on keys and unique_correlation_count
         const api2Map = new Map();
-
-        // Populate the map with keys and unique_correlation_count
         api2Buckets.forEach((bucket) => {
           api2Map.set(bucket.key, bucket.unique_correlation_count.value);
         });
-
-        // Map the unique_correlation_count from api2Data into api1Data
         const updatedApi1Buckets = api1Buckets.map((bucket) => {
-          const correlationCount = api2Map.get(bucket.key) || 0; // Default to 0 if no match
+          const correlationCount = api2Map.get(bucket.key) || 0;
           return {
             ...bucket,
             unique_correlation_count: {
               ...bucket.unique_correlation_count,
-              value: correlationCount, // Update the unique_correlation_count
+              value: correlationCount,
             },
           };
         });
 
-        // Return the updated structure
         return {
           ...api1Data,
           aggregations: {
@@ -209,24 +182,15 @@ const ECommerce = () => {
         };
       };
 
-      // Map the correlation counts
       const updatedApi1Data = mapCorrelationCounts(response1, response2);
 
-      // Combine the results
-      // const combinedResponse = {
-      //   api1Data: updatedApi1Data,
-      //   api2Data: response2,
-      // };
-
-      // Set the combined response to state
-      setDocuments(updatedApi1Data); // Adjust the state update as needed based on your application
+      setDocuments(updatedApi1Data);
     } catch (error) {
-      console.error("Error during fetchDocuments:", error);
+      console.error("Error ==>", error);
     } finally {
-      setLoading(false); // Ensure loading is set to false regardless of success or error
+      setLoading(false);
     }
   };
-
   const fetchTotalRequest = () => {
     fetchData(TotalRequest(selectedEnv), (dataRes) => setTotal(dataRes?.count));
   };
@@ -251,7 +215,7 @@ const ECommerce = () => {
 
   const fetchTotalSentEdoc = () => {
     setLoading(true);
-    fetchData(bodySendEdoc(startDate2, endDate2), (dataRes) => {
+    fetchData(bodySendEdoc(startDateEdoc, endDate2), (dataRes) => {
       updateSentEdocCount(dataRes?.count, "SentEdoc");
       setLoading(false);
     });
@@ -259,54 +223,40 @@ const ECommerce = () => {
 
   const fetchTotalGetEdoc = () => {
     setLoading(true);
-    fetchData(bodyGetEdoc(startDate2, endDate2), (dataRes) => {
+    fetchData(bodyGetEdoc(startDateEdoc, endDate2), (dataRes) => {
       updateSentEdocCount(dataRes?.count, "GetEdoc");
       setLoading(false);
     });
   };
 
-  const divRef = useRef(null);
-  const [divHeight, setDivHeight] = useState(0);
-
   useEffect(() => {
-    if (divRef.current) {
-      setDivHeight(divRef.current.clientHeight);
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log("goi ham");
     fetchDocuments();
   }, [startDate, endDate, selectedEnv, selectedOptionApp]);
-
   useEffect(() => {
     fetchTotalGetEdoc();
     fetchTotalSentEdoc();
-  }, [startDate2, endDate2]);
-
+  }, [startDateEdoc, endDate2]);
   useEffect(() => {
     fetchTotalRequest();
     fetchTotalPhanMem();
     fetchTotalAPI();
     fetchTotalAPIToday();
   }, [selectedEnv]);
-
+  //Tinh loi Edoc
   useEffect(() => {
     const fetchCorrelationIds = async () => {
       const filters = [];
-
-      // Check if start and end are not null and add range condition to filters
-      if (startDate2 && endDate2) {
+      if (startDateEdoc && endDate2) {
         filters.push({
           range: {
             date_created: {
-              gt: startDate2,
+              gt: startDateEdoc,
               lt: endDate2,
             },
           },
         });
       }
-      setLoading2(true);
+      setLoadingEdoc(true);
       try {
         const requestData = {
           index: "apim-request-index/_search",
@@ -335,22 +285,19 @@ const ECommerce = () => {
           },
         };
 
-        // Gọi API và lưu correlationIds
         const ids = await fetchData3(requestData, null, "/api/service");
         setCorrelationIds(ids);
       } catch (err) {
         console.error("Failed to fetch correlation IDs", err);
-        // setError("Failed to fetch data");
       } finally {
-        // setLoading2(false);
       }
     };
 
     fetchCorrelationIds();
-  }, [startDate2, endDate2]);
+  }, [startDateEdoc, endDate2]);
   useEffect(() => {
     const fetchMatchingResponses = async () => {
-      setLoading2(true);
+      setLoadingEdoc(true);
       try {
         const requestData = {
           index: "apim-response-index/_search",
@@ -371,22 +318,19 @@ const ECommerce = () => {
           },
         };
 
-        // Gọi API trực tiếp
         const response = await axios.post("/api/service", requestData, {
           headers: {
             "Content-Type": "application/json",
           },
         });
 
-        // Lấy số lượng correlation_id duy nhất từ Elasticsearch
         const count =
           response.data.aggregations?.unique_correlation_ids?.value || 0;
         setMatchingCount(count);
       } catch (err) {
         console.error("Failed to check responses", err);
-        // setError("Failed to fetch response data");
       } finally {
-        setLoading2(false);
+        setLoadingEdoc(false);
       }
     };
 
@@ -394,17 +338,10 @@ const ECommerce = () => {
       fetchMatchingResponses();
     }
   }, [correlationIds]);
-  console.log("startDay", startDate);
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardDataStats
-          title="Request"
-          total={Total.toLocaleString("de-DE")}
-          // rate="0.43%"
-
-          // levelUp
-        >
+        <CardDataStats title="Request" total={Total.toLocaleString("de-DE")}>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -436,19 +373,19 @@ const ECommerce = () => {
             width="30"
             height="30"
           >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g
               id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             ></g>
             <g id="SVGRepo_iconCarrier">
               <g
                 id="Page-1"
                 stroke="none"
-                stroke-width="1"
+                strokeWidth="1"
                 fill="none"
-                fill-rule="evenodd"
+                fillRule="evenodd"
               >
                 <g
                   id="icon"
@@ -510,11 +447,11 @@ const ECommerce = () => {
             viewBox="0 0 512 512"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g
               id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             ></g>
             <g id="SVGRepo_iconCarrier">
               <path d="M416,64H400V48.45c0-8.61-6.62-16-15.23-16.43A16,16,0,0,0,368,48V64H144V48.45c0-8.61-6.62-16-15.23-16.43A16,16,0,0,0,112,48V64H96a64,64,0,0,0-64,64v12a4,4,0,0,0,4,4H476a4,4,0,0,0,4-4V128A64,64,0,0,0,416,64Z"></path>
@@ -533,7 +470,7 @@ const ECommerce = () => {
         </div>
       </div>
       <div className="mt-4 flex flex-col gap-4 md:mt-6 md:gap-6 xl:flex-row 2xl:mt-7.5 2xl:gap-7.5">
-        <div ref={divRef} className="flex w-full flex-col xl:w-2/3">
+        <div className="flex w-full flex-col xl:w-2/3">
           <div className="flex-grow">
             <TableFive
               loading={loading}
@@ -541,6 +478,7 @@ const ECommerce = () => {
               onEndDateChange={handleEndDateChange}
               data={documents}
               search={false}
+              lienthong={false}
             />
           </div>
           {/* <div className="mt-8 w-full">
@@ -553,17 +491,17 @@ const ECommerce = () => {
           className="flex w-full flex-col xl:w-1/3"
         >
           <TableFive
-            loading={loading2}
+            loading={loadingEdoc}
             xuatEx={false}
             onStartDateChange={handleStartDateChange2}
             onEndDateChange={handleEndDateChange2}
             data={dataSentEdoc}
             search={false}
-            lienthong={false}
+            lienthong={true}
             title="Thống kê gửi nhận văn bản"
           />
           <div className="mt-6" />
-          <ChatCard height={divHeight} />
+          <ChatCard />
         </div>
       </div>
 

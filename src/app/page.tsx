@@ -15,7 +15,7 @@ const DefaultLayout = dynamic(
   () => import("@/components/Layouts/DefaultLayout"),
   { ssr: false },
 );
-const ECommerce = dynamic(() => import("@/components/Dashboard/E-commerce"), {
+const ECommerce = dynamic(() => import("@/components/Dashboard/Dashboard"), {
   ssr: true,
 });
 export default function Home() {

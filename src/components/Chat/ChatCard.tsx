@@ -10,7 +10,7 @@ import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
 import { useRecoilState } from "recoil";
 import { optionEnviroment, optionService } from "../../../utilities/Atom/atom";
 
-const ChatCard = ({ height }) => {
+const ChatCard = ({}) => {
   const [optionData, setOptionData] = useRecoilState(optionService);
   const [optionDataApp, setOptionDataApp] = useState([]);
 
@@ -19,10 +19,7 @@ const ChatCard = ({ height }) => {
 
   const [data, setData] = useState([]);
   const [selectedEnv] = useRecoilState(optionEnviroment);
-  console.log(
-    "ALO ALO",
-    bodyLog(selectedEnv, selectedOption, selectedOptionApp),
-  );
+
   const fetchData = async () => {
     try {
       const response = await axios({
@@ -86,8 +83,6 @@ const ChatCard = ({ height }) => {
     fetchData();
   }, [selectedOption, selectedEnv, selectedOptionApp]);
 
-  console.log(selectedOption);
-  // Hàm xử lý khi người dùng chọn một giá trị mới từ dropdown
   const handleSelectChange = (value: string) => {
     setSelectedOption(value);
   };
@@ -114,10 +109,9 @@ const ChatCard = ({ height }) => {
           <div className="mr-2">
             {optionData != null && (
               <>
-                <label style={{ fontFamily: 'sans-serif' }}>Phần mềm</label>
+                <label style={{ fontFamily: "sans-serif" }}>Phần mềm</label>
 
                 <SelectGroupTwo
-                
                   onSelect={handleSelectAppChange}
                   label=""
                   options={[

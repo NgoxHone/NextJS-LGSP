@@ -40,7 +40,6 @@ const Table = ({
   const [startDate, setStartDate] = useState(getLastMonthDate);
   const [endDate, setEndDate] = useState(getTodayDate);
   const [searchTerm, setSearchTerm] = useState("");
-  console.log("Today==>", getTodayDate());
   const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debouncing 500ms
   const fetchOptionApp = async () => {
     try {
@@ -79,7 +78,6 @@ const Table = ({
     }
   };
   useEffect(() => {
-    // fetchOption();
     fetchOption()
     fetchOptionApp();
   }, [selectedEnv]);
@@ -188,7 +186,7 @@ const Table = ({
               className="border-gray-400 dark:border-gray-600 dark:text-gray-300 relative z-20 w-full w-full appearance-none rounded rounded-md border border border-stroke bg-transparent px-12 px-4 py-2 py-3 outline-none transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-blue-600 active:border-primary dark:border-form-strokedark dark:bg-boxdark dark:bg-form-input dark:focus:ring-blue-400"
             />
           </div>
-          {lienthong && <div className="mr-0">
+          {!lienthong && <div className="mr-0">
             {optionDataApp != null && (<>
               <label className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium">
                 Phần mềm
@@ -263,20 +261,20 @@ const Table = ({
               <th className="w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 STT
               </th>
-              {lienthong && (
+              {!lienthong && (
                 <th className="w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                   {app ? "Mã" : "Mã"}
                 </th>
               )}
 
-              <th className={!lienthong ? "w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base" : "w-[50%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base"}>
+              <th className={lienthong ? "w-[10%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base" : "w-[50%] px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base"}>
                 {app ? "Phần mềm" : "Dịch vụ"}
               </th>
 
               <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
                 request
               </th>
-              {lienthong && !app && (<>
+              {!lienthong && !app && (<>
                 <th style={{ textAlign: 'center' }} className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm">
                   thành công
                 </th>
@@ -299,7 +297,7 @@ const Table = ({
                   >
                     {index + 1}
                   </td>
-                  {lienthong && (
+                  {!lienthong && (
                     <td
                       style={{ alignItems: "center" }}
                       className="items-center whitespace-normal px-6 py-3 text-left"
@@ -321,7 +319,7 @@ const Table = ({
                       ? bucket?.doc_count?.toLocaleString()
                       : bucket?.unique_correlation_count?.value?.toLocaleString()} */}
                     {bucket?.doc_count?.toLocaleString()}
-                    {!lienthong && index == 0 && matchingCount != 0 && !loading && <>
+                    {lienthong && index == 0 && matchingCount != 0 && !loading && <>
 
 
                       <p style={{ fontSize: 13 }}>
@@ -334,7 +332,7 @@ const Table = ({
                     </>
                     }
                   </td>
-                  {lienthong && !app && (
+                  {!lienthong && !app && (
                     <>
                       <td
                         style={{ fontWeight: "bold", textAlign: 'center' }}

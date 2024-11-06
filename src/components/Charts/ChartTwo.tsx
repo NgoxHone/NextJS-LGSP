@@ -117,7 +117,7 @@ const ChartTwo: React.FC = () => {
       setData,
     ).finally(() => setLoading(false));
   };
-  console.log(bodyByWeek(getDatesOfCurrentWeek(), [getCurrentMonth()]));
+  // console.log(bodyByWeek(getDatesOfCurrentWeek(), [getCurrentMonth()]));
   useEffect(() => fetchDocuments(), [selectedEnv]);
   const temp = data.aggregations.count_by_day.buckets.map(
     (bucket) => bucket.doc_count,
@@ -128,7 +128,6 @@ const ChartTwo: React.FC = () => {
       data: temp,
     },
   ];
-  console.log(series);
   // const series = [
   //   {
   //     name: "Sales",

@@ -76,7 +76,6 @@ export function data1(start, end, selectedEnv, app) {
 export function dataMM(start, end, selectedEnv, app) {
   const filters = [];
 
-  // Check if start and end are not null and add range condition to filters
   if (start) {
     filters.push({
       range: {
@@ -88,7 +87,6 @@ export function dataMM(start, end, selectedEnv, app) {
     });
   }
 
-  // If the selected environment is not "ALL", add condition to filters
   if (selectedEnv && selectedEnv !== "ALL") {
     filters.push({
       term: {
@@ -97,11 +95,10 @@ export function dataMM(start, end, selectedEnv, app) {
     });
   }
 
-  // If the app is provided, add condition to filters
   if (app && app != "Tất cả") {
     filters.push({
       term: {
-        application_name: app, // Assuming the field name in the index is "application"
+        application_name: app,
       },
     });
   }
@@ -125,19 +122,19 @@ export function dataMM(start, end, selectedEnv, app) {
           aggs: {
             unique_correlation_count: {
               cardinality: {
-                field: "correlation_id", // Count unique correlation_id for each API
+                field: "correlation_id",
               },
             },
             by_failure: {
               filter: {
                 term: {
-                  isSuccess: false, // Filter documents where isSuccess is false
+                  isSuccess: false,
                 },
               },
               aggs: {
                 unique_failure_count: {
                   cardinality: {
-                    field: "correlation_id", // Count unique correlation_id for failed documents
+                    field: "correlation_id",
                   },
                 },
               },
@@ -151,8 +148,6 @@ export function dataMM(start, end, selectedEnv, app) {
 
 export function dataCombined(start, end, selectedEnv, app) {
   const filters = [];
-
-  // Kiểm tra start và end và thêm điều kiện range vào filters
   if (start) {
     filters.push({
       range: {
@@ -164,7 +159,6 @@ export function dataCombined(start, end, selectedEnv, app) {
     });
   }
 
-  // Nếu selectedEnv không phải "ALL", thêm điều kiện vào filters
   if (selectedEnv && selectedEnv !== "ALL") {
     filters.push({
       term: {
@@ -173,7 +167,6 @@ export function dataCombined(start, end, selectedEnv, app) {
     });
   }
 
-  // Nếu app được cung cấp, thêm điều kiện vào filters
   if (app && app !== "Tất cả") {
     filters.push({
       term: {
@@ -183,7 +176,7 @@ export function dataCombined(start, end, selectedEnv, app) {
   }
 
   return {
-    index: "apim-request-index,apim-response-index", // Sử dụng mảng để truy vấn trên cả hai chỉ mục
+    index: "apim-request-index,apim-response-index",
     body: {
       size: 0,
       query: {
@@ -261,7 +254,7 @@ export const TotalPN = {
   },
 };
 
-export const TotalPN2 = (start, end, selectedEnv,api) => {
+export const TotalPN2 = (start, end, selectedEnv, api) => {
   const filters = [
     {
       range: {
@@ -283,7 +276,7 @@ export const TotalPN2 = (start, end, selectedEnv,api) => {
   if (api && api != "Tất cả") {
     filters.push({
       term: {
-        api: api, // Assuming the field name in the index is "application"
+        api: api,
       },
     });
   }
