@@ -30,7 +30,7 @@ const Table = ({
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     return lastMonth.toISOString().split("T")[0];
   };
-  
+
   const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp, setSelectedOptionApp] = useRecoilState(optionOptionApp);

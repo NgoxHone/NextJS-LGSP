@@ -491,7 +491,7 @@ const ECommerce = () => {
           className="flex w-full flex-col xl:w-1/3"
         >
           <TableFive
-            loading={loadingEdoc}
+            // loading={loadingEdoc}
             xuatEx={false}
             onStartDateChange={handleStartDateChange2}
             onEndDateChange={handleEndDateChange2}
