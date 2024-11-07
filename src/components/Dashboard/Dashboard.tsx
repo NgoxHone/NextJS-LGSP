@@ -204,13 +204,13 @@ const ECommerce = () => {
         null,
       );
       setDocuments(response1); // Cập nhật giao diện với dữ liệu API 1 ngay lập tức
-  
+
       // Gọi API 2 mà không đợi
       const response2 = await fetchData2(
         dataMM(startDate, endDate, selectedEnv, selectedOptionApp),
         null,
       );
-  
+
       // Cập nhật lại dữ liệu khi API 2 hoàn thành
       const mapCorrelationCounts = (api1Data, api2Data) => {
         const api1Buckets = api1Data.aggregations.group_by_api.buckets;
@@ -229,7 +229,7 @@ const ECommerce = () => {
             },
           };
         });
-  
+
         return {
           ...api1Data,
           aggregations: {
@@ -241,17 +241,17 @@ const ECommerce = () => {
           },
         };
       };
-  
+
       const updatedApi1Data = mapCorrelationCounts(response1, response2);
       setDocuments(updatedApi1Data); // Cập nhật giao diện với dữ liệu kết hợp
-  
+
     } catch (error) {
       console.error("Error ==>", error);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const fetchTotalRequest = () => {
     fetchData(TotalRequest(selectedEnv), (dataRes) => setTotal(dataRes?.count));
   };
@@ -510,7 +510,7 @@ const ECommerce = () => {
           });
 
           // Gọi API GetEdoc
-          const getEdocResponse = axios.get('http://localhost:3000/api/GetEdoc', {
+          const getEdocResponse = axios.get('/api/GetEdoc', {
             params: {
               from: startDateEdoc,
               to: endDate2,

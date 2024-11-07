@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import useDebounce from "../../hooks/useDebounce";
 import MultiSelect from "../FormElements/MultiSelect";
@@ -8,7 +8,7 @@ import axios from "axios";
 import { dataOption, dataOptionApp } from "../Chat/body";
 import { matchingCountState, matchingCountState2, optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
 import { useRecoilState } from "recoil";
-const Table = ({
+const Table = memo(({
   data,
   onStartDateChange,
   onEndDateChange,
@@ -256,7 +256,8 @@ const Table = ({
           </button>
         )}
       </div>
-      {!loading ? <div className="mt-6">
+      {/* {!loading ? */}
+      <div className="mt-6">
         <table className="mb-10 min-w-full table-auto">
           <thead style={{ backgroundColor: "#f3f4f6", borderRadius: 20 }}>
             <tr className="bg-gray-200 text-gray-600 border-gray-300 round-lg text-sm uppercase leading-normal">
@@ -333,7 +334,7 @@ const Table = ({
 
                     </>
                     }
-                    {lienthong && index == 1 && matchingCount2 != 0 && !loading && <>
+                    {(lienthong && index == 1 && matchingCount2 != 0 && !loading) && <>
 
 
                       <p style={{ fontSize: 13 }}>
@@ -435,9 +436,9 @@ const Table = ({
               </a>
             </div>
         )}
-      </div> : <p>Đang tải...</p>}
+      </div>
     </div>
   );
-};
+})
 
 export default Table;
