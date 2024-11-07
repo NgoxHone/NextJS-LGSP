@@ -321,10 +321,8 @@ const Table = (({
                     {/* {!lienthong
                       ? bucket?.doc_count?.toLocaleString()
                       : bucket?.unique_correlation_count?.value?.toLocaleString()} */}
-                    Tổng: {bucket?.doc_count?.toLocaleString()}
+                    {lienthong && "Tổng:"} {bucket?.doc_count?.toLocaleString()}
                     {lienthong && index == 0 && matchingCount != 0 && !loading && <>
-
-
                       <p style={{ fontSize: 13 }}>
                         Thành công: {matchingCount.toLocaleString()} ({Math.round((matchingCount / bucket?.doc_count) * 100).toLocaleString() + "%"})
                       </p>
