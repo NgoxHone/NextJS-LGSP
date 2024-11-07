@@ -34,3 +34,7 @@ export const matchingCountState = atom({
   key: 'matchingCountState', // Mỗi atom phải có một key duy nhất
   default: 0, // Giá trị mặc định ban đầu
 });
+export const matchingCountState2 = atom({
+  key: 'matchingCountState2', // Mỗi atom phải có một key duy nhất
+  default: 0, // Giá trị mặc định ban đầu
+});

@@ -318,15 +318,15 @@ const Table = ({
                     {/* {!lienthong
                       ? bucket?.doc_count?.toLocaleString()
                       : bucket?.unique_correlation_count?.value?.toLocaleString()} */}
-                    {bucket?.doc_count?.toLocaleString()}
+                    Tổng: {bucket?.doc_count?.toLocaleString()}
                     {lienthong && index == 0 && matchingCount != 0 && !loading && <>
 
 
                       <p style={{ fontSize: 13 }}>
-                        {matchingCount.toLocaleString()} ({Math.round((matchingCount / bucket?.doc_count) * 100).toLocaleString() + "%"}) thành công
+                        Thành công: {matchingCount.toLocaleString()} ({Math.round((matchingCount / bucket?.doc_count) * 100).toLocaleString() + "%"})
                       </p>
                       <p style={{ fontSize: 13 }}>
-                        {(bucket?.doc_count - matchingCount).toLocaleString()} ({Math.round(((bucket?.doc_count - matchingCount) / bucket?.doc_count) * 100).toLocaleString() + "%"}) thất bại
+                        Thất bại: {(bucket?.doc_count - matchingCount).toLocaleString()} ({Math.round(((bucket?.doc_count - matchingCount) / bucket?.doc_count) * 100).toLocaleString() + "%"})
                       </p>
 
                     </>

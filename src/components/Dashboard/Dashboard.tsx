@@ -36,6 +36,7 @@ import Calendar from "../Calender";
 import { useRecoilState } from "recoil";
 import {
   matchingCountState,
+  matchingCountState2,
   optionEnviroment,
   optionOptionApp,
 } from "../../../utilities/Atom/atom";
@@ -74,9 +75,10 @@ const ECommerce = () => {
   const [documents, setDocuments] = useState(data);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp] = useRecoilState(optionOptionApp);
-
+  const [correlationIds2, setCorrelationIds2] = useState([]);
   const [correlationIds, setCorrelationIds] = useState([]);
   const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
+  const [matchingCount2, setMatchingCount2] = useRecoilState(matchingCountState2);
   const [loadingEdoc, setLoadingEdoc] = useState(true);
   const [startDate, setStartDate] = useState(getLastMonthDate());
   const [endDate, setEndDate] = useState(
@@ -296,6 +298,59 @@ const ECommerce = () => {
     fetchCorrelationIds();
   }, [startDateEdoc, endDate2]);
   useEffect(() => {
+    const fetchCorrelationIds = async () => {
+      const filters = [];
+      if (startDateEdoc && endDate2) {
+        filters.push({
+          range: {
+            date_created: {
+              gt: startDateEdoc,
+              lt: endDate2,
+            },
+          },
+        });
+      }
+      setLoadingEdoc(true);
+      try {
+        const requestData = {
+          index: "apim-request-index/_search",
+          body: {
+            size: 0,
+            query: {
+              bool: {
+                filter: filters,
+                must: [
+                  {
+                    match: { full_request_path: "/vdxp-product/1.0/getEdoc" },
+                  },
+                ],
+              },
+            },
+            aggs: {
+              correlation_ids: {
+                composite: {
+                  size: 50000,
+                  sources: [
+                    { correlation_id: { terms: { field: "correlation_id" } } },
+                  ],
+                },
+              },
+            },
+          },
+        };
+
+        const ids = await fetchData3(requestData, null, "/api/service");
+        console.log(ids)
+        setCorrelationIds2(ids);
+      } catch (err) {
+        console.error("Failed to fetch correlation IDs", err);
+      } finally {
+      }
+    };
+
+    fetchCorrelationIds();
+  }, [startDateEdoc, endDate2]);
+  useEffect(() => {
     const fetchMatchingResponses = async () => {
       setLoadingEdoc(true);
       try {
@@ -338,6 +393,52 @@ const ECommerce = () => {
       fetchMatchingResponses();
     }
   }, [correlationIds]);
+  useEffect(() => {
+    const fetchMatchingResponses = async () => {
+      setLoadingEdoc(true);
+      try {
+        const requestData = {
+          index: "apim-response-index/_search",
+          body: {
+            size: 0,
+            query: {
+              terms: {
+                correlation_id: correlationIds2, // Truyền danh sách correlation_id
+              },
+            },
+            aggs: {
+              unique_correlation_ids: {
+                cardinality: {
+                  field: "correlation_id", // Đếm các correlation_id duy nhất
+                },
+              },
+            },
+          },
+        };
+
+        const response = await axios.post("/api/service", requestData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const count =
+          response.data.aggregations?.unique_correlation_ids?.value || 0;
+        setMatchingCount2(count);
+      } catch (err) {
+        console.error("Failed to check responses", err);
+      } finally {
+        setLoadingEdoc(false);
+      }
+    };
+
+    if (correlationIds.length > 0) {
+      fetchMatchingResponses();
+    }
+  }, [correlationIds2]);
+  console.log("--->", correlationIds2.length)
+
+  console.log(matchingCount2)
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
@@ -364,7 +465,7 @@ const ECommerce = () => {
           click={() => router.push("/services")}
           title="Dịch vụ"
           total={TotalAPI}
-          // rate="4.35%" levelUp
+        // rate="4.35%" levelUp
         >
           <svg
             viewBox="0 0 512 512"
