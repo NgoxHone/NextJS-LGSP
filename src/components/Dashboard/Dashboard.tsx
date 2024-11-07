@@ -143,19 +143,75 @@ const ECommerce = () => {
       };
     });
   };
+  // const fetchDocuments = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response1 = await fetchData2(
+  //       data1(startDate, endDate, selectedEnv, selectedOptionApp),
+  //       null,
+  //     );
+
+  //     const response2 = await fetchData2(
+  //       dataMM(startDate, endDate, selectedEnv, selectedOptionApp),
+  //       null,
+  //     );
+
+  //     const mapCorrelationCounts = (api1Data, api2Data) => {
+  //       const api1Buckets = api1Data.aggregations.group_by_api.buckets;
+  //       const api2Buckets = api2Data.aggregations.group_by_api.buckets;
+  //       const api2Map = new Map();
+  //       api2Buckets.forEach((bucket) => {
+  //         api2Map.set(bucket.key, bucket.unique_correlation_count.value);
+  //       });
+  //       const updatedApi1Buckets = api1Buckets.map((bucket) => {
+  //         const correlationCount = api2Map.get(bucket.key) || 0;
+  //         return {
+  //           ...bucket,
+  //           unique_correlation_count: {
+  //             ...bucket.unique_correlation_count,
+  //             value: correlationCount,
+  //           },
+  //         };
+  //       });
+
+  //       return {
+  //         ...api1Data,
+  //         aggregations: {
+  //           ...api1Data.aggregations,
+  //           group_by_api: {
+  //             ...api1Data.aggregations.group_by_api,
+  //             buckets: updatedApi1Buckets, // Updated buckets
+  //           },
+  //         },
+  //       };
+  //     };
+
+  //     const updatedApi1Data = mapCorrelationCounts(response1, response2);
+
+  //     setDocuments(updatedApi1Data);
+  //   } catch (error) {
+  //     console.error("Error ==>", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const fetchDocuments = async () => {
     setLoading(true);
     try {
+      // Gọi API 1 và trả dữ liệu ngay khi nhận được
       const response1 = await fetchData2(
         data1(startDate, endDate, selectedEnv, selectedOptionApp),
         null,
       );
-
+      setDocuments(response1); // Cập nhật giao diện với dữ liệu API 1 ngay lập tức
+  
+      // Gọi API 2 mà không đợi
       const response2 = await fetchData2(
         dataMM(startDate, endDate, selectedEnv, selectedOptionApp),
         null,
       );
-
+  
+      // Cập nhật lại dữ liệu khi API 2 hoàn thành
       const mapCorrelationCounts = (api1Data, api2Data) => {
         const api1Buckets = api1Data.aggregations.group_by_api.buckets;
         const api2Buckets = api2Data.aggregations.group_by_api.buckets;
@@ -173,28 +229,29 @@ const ECommerce = () => {
             },
           };
         });
-
+  
         return {
           ...api1Data,
           aggregations: {
             ...api1Data.aggregations,
             group_by_api: {
               ...api1Data.aggregations.group_by_api,
-              buckets: updatedApi1Buckets, // Updated buckets
+              buckets: updatedApi1Buckets,
             },
           },
         };
       };
-
+  
       const updatedApi1Data = mapCorrelationCounts(response1, response2);
-
-      setDocuments(updatedApi1Data);
+      setDocuments(updatedApi1Data); // Cập nhật giao diện với dữ liệu kết hợp
+  
     } catch (error) {
       console.error("Error ==>", error);
     } finally {
       setLoading(false);
     }
   };
+  
   const fetchTotalRequest = () => {
     fetchData(TotalRequest(selectedEnv), (dataRes) => setTotal(dataRes?.count));
   };
@@ -453,7 +510,7 @@ const ECommerce = () => {
           });
 
           // Gọi API GetEdoc
-          const getEdocResponse = axios.get('/api/GetEdoc', {
+          const getEdocResponse = axios.get('http://localhost:3000/api/GetEdoc', {
             params: {
               from: startDateEdoc,
               to: endDate2,

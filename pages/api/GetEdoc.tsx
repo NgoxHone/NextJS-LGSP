@@ -132,7 +132,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(200).json({
                 message: 'Success',
                 totalCorrelationIds: correlationIds.length,
-                uniqueSuccessCorrelationIds: uniqueCount
+                uniqueSuccessCorrelationIds: correlationIds.length - uniqueCount
             });
         } else {
             res.status(200).json({

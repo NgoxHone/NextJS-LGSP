@@ -337,10 +337,10 @@ const Table = ({
 
 
                       <p style={{ fontSize: 13 }}>
-                        Thành công: {matchingCount2.toLocaleString()} ({Math.round((matchingCount2 / bucket?.doc_count) * 100).toLocaleString() + "%"})
+                        Thành công: {(bucket?.doc_count - matchingCount2).toLocaleString()} ({Math.round(((bucket?.doc_count - matchingCount2) / bucket?.doc_count) * 100).toLocaleString() + "%"})
                       </p>
                       <p style={{ fontSize: 13 }}>
-                        Thất bại: {(bucket?.doc_count - matchingCount2).toLocaleString()} ({Math.round(((bucket?.doc_count - matchingCount2) / bucket?.doc_count) * 100).toLocaleString() + "%"})
+                        Thất bại: {matchingCount2.toLocaleString()} ({Math.round((matchingCount2 / bucket?.doc_count) * 100).toLocaleString() + "%"})
                       </p>
 
                     </>
