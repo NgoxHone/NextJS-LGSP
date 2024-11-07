@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import useDebounce from "../../hooks/useDebounce";
 import MultiSelect from "../FormElements/MultiSelect";
@@ -8,7 +8,7 @@ import axios from "axios";
 import { dataOption, dataOptionApp } from "../Chat/body";
 import { matchingCountState, matchingCountState2, optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
 import { useRecoilState } from "recoil";
-const Table = memo(({
+const Table = (({
   data,
   onStartDateChange,
   onEndDateChange,
