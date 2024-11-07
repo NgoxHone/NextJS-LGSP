@@ -6,7 +6,7 @@ import { getDatabaseDescription } from "../../../utilities/GlobalFunction";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
 import axios from "axios";
 import { dataOption, dataOptionApp } from "../Chat/body";
-import { matchingCountState, optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
+import { matchingCountState, matchingCountState2, optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
 import { useRecoilState } from "recoil";
 const Table = ({
   data,
@@ -32,6 +32,8 @@ const Table = ({
   };
 
   const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
+
+  const [matchingCount2, setMatchingCount2] = useRecoilState(matchingCountState2);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp, setSelectedOptionApp] = useRecoilState(optionOptionApp);
   const [selectedOption, setSelectedOption] = useRecoilState(optionOption);
@@ -327,6 +329,18 @@ const Table = ({
                       </p>
                       <p style={{ fontSize: 13 }}>
                         Thất bại: {(bucket?.doc_count - matchingCount).toLocaleString()} ({Math.round(((bucket?.doc_count - matchingCount) / bucket?.doc_count) * 100).toLocaleString() + "%"})
+                      </p>
+
+                    </>
+                    }
+                    {lienthong && index == 1 && matchingCount2 != 0 && !loading && <>
+
+
+                      <p style={{ fontSize: 13 }}>
+                        Thành công: {matchingCount2.toLocaleString()} ({Math.round((matchingCount2 / bucket?.doc_count) * 100).toLocaleString() + "%"})
+                      </p>
+                      <p style={{ fontSize: 13 }}>
+                        Thất bại: {(bucket?.doc_count - matchingCount2).toLocaleString()} ({Math.round(((bucket?.doc_count - matchingCount2) / bucket?.doc_count) * 100).toLocaleString() + "%"})
                       </p>
 
                     </>

@@ -1,6 +1,15 @@
 import axios, { AxiosError } from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { Client } from '@elastic/elasticsearch';
+
+const client = new Client({
+  node: 'http://172.17.17.121:9202',
+  auth: {
+    username: 'elastic',
+    password: 'elastic'
+  }
+});
 interface ElasticsearchErrorResponse {
   message: string;
   status?: number;
@@ -53,3 +62,4 @@ export default async function handler(
     }
   }
 }
+
