@@ -220,6 +220,14 @@ export function getDatabaseDescription(id) {
       return "Sở tài chính";
     case "PMDuLieuGiaoThong":
       return "Phần mềm dữ liệu giao thông";
+    case "EVN":
+      return "Hệ thống dịch vụ, tiện ích của Tập đoàn Điện lực Việt Nam (EVN) - chưa tích hợp";
+    case "SSO.VNeID":
+      return "Hệ thống định danh và xác thực điện tử (Bộ Công an)";
+    case "PMDuLieuGiaoThong":
+      return "Phần mềm dữ liệu giao thông";
+    case "vpostcode":
+      return "Hệ thống mã bưu chính Vpostcode  (Tổng Công ty  Bưu điện Việt  Nam)";
     default:
       return id;
   }
@@ -335,3 +343,18 @@ export const checkResponses = async (correlationIds) => {
     throw error;
   }
 };
+
+// export const getStatusStyles = (statusCode) => {
+//   switch (true) {
+//     case statusCode >= 200 && statusCode < 300:
+//       return "bg-green-500 text-white border-green-700"; // Thành công
+//     case statusCode >= 300 && statusCode < 400:
+//       return "bg-blue-500 text-white border-blue-700"; // Điều hướng
+//     case statusCode >= 400 && statusCode < 500:
+//       return "bg-yellow-500 text-white border-yellow-700"; // Lỗi client
+//     case statusCode >= 500:
+//       return "bg-red-500 text-white border-red-700"; // Lỗi server
+//     default:
+//       return "bg-gray-500 text-white border-gray-700"; // Không xác định
+//   }
+// };

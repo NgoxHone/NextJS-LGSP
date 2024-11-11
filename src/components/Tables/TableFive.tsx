@@ -1,3 +1,5 @@
+"use client";
+import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import useDebounce from "../../hooks/useDebounce";
@@ -8,6 +10,9 @@ import axios from "axios";
 import { dataOption, dataOptionApp } from "../Chat/body";
 import { matchingCountState, matchingCountState2, optionEnviroment, optionOption, optionOptionApp, optionService } from "../../../utilities/Atom/atom";
 import { useRecoilState } from "recoil";
+// import Link from "next/link";
+import { useRouter } from "next/router";
+import Link from "next/link";
 const Table = (({
   data,
   onStartDateChange,
@@ -19,6 +24,7 @@ const Table = (({
   app = false,
   loading = false
 }) => {
+
   const { aggregations } = data;
   const getTodayDate = () => {
     const today = new Date();
@@ -31,8 +37,8 @@ const Table = (({
     return lastMonth.toISOString().split("T")[0];
   };
 
-  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
 
+  const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
   const [matchingCount2, setMatchingCount2] = useRecoilState(matchingCountState2);
   const [selectedEnv] = useRecoilState(optionEnviroment);
   const [selectedOptionApp, setSelectedOptionApp] = useRecoilState(optionOptionApp);
@@ -43,6 +49,12 @@ const Table = (({
   const [endDate, setEndDate] = useState(getTodayDate);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debouncing 500ms
+  // const router = useRouter();
+  // const handleNavigation = () => {
+  //   if (typeof window !== "undefined") { // Kiểm tra nếu đang ở client
+  //     router.push("/");
+  //   }
+  // };
   const fetchOptionApp = async () => {
     try {
       const response = await axios({
@@ -153,6 +165,7 @@ const Table = (({
       className="rounded-lg border border-stroke bg-white px-6 pb-4 pt-6 shadow-lg dark:border-strokedark dark:bg-boxdark sm:px-8 xl:pb-3"
       style={{ fontFamily: "'Roboto', sans-serif" }}
     >
+
       <div className="mb-6 flex flex-wrap items-center justify-between gap-6">
         {title != "" && (
           <p
@@ -291,9 +304,10 @@ const Table = (({
             {filteredData?.map((bucket, index) => (
               <React.Fragment key={bucket.key}>
                 <tr
+                  onClick={() => handleNavigation()}
                   style={{ alignItems: "center", justifyContent: "center" }}
-                  className="hover:bg-gray-100 fade-in"
-                >
+                  className="table-row">
+
                   <td
                     style={{ alignItems: "center" }}
                     className=" items-center whitespace-normal px-6 py-3 text-left"
@@ -345,6 +359,7 @@ const Table = (({
                     </>
                     }
                   </td>
+
                   {!lienthong && !app && (
                     <>
                       <td
@@ -366,11 +381,16 @@ const Table = (({
                       })()}
                         {"\n"}
                         {/* {bucket?.unique_correlation_count?.value > bucket?.doc_count ? bucket?.doc_count : bucket?.doc_count ? bucket?.unique_correlation_count?.value.toLocaleString()}{"\n"} */}
-                        ({Math.round(
-                          (bucket?.unique_correlation_count?.value > bucket?.doc_count
-                            ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
-                            : bucket?.unique_correlation_count?.value) / bucket?.doc_count * 100
-                        ).toLocaleString() + "%"})
+                        ({
+                          bucket?.doc_count > 0
+                            ? Math.round(
+                              (bucket?.unique_correlation_count?.value > bucket?.doc_count
+                                ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
+                                : bucket?.unique_correlation_count?.value) / bucket?.doc_count * 100
+                            ).toLocaleString() + "%"
+                            : "0%" // Return "0%" if doc_count is 0 or undefined
+                        })
+
                         {/* {bucket?.unique_correlation_count?.value.toLocaleString()}{"\n"}
                         ({
                           bucket?.unique_correlation_count?.value > 0
@@ -403,12 +423,14 @@ const Table = (({
                               : "0%" // If unique_correlation_count is 0 or not present, display 0%
                         })
                       </td>
-
-
                     </>
                   )}
 
-
+                  {!lienthong && <td>
+                    <Link href="/">
+                      Chi tiết
+                    </Link>
+                  </td>}
                 </tr>
                 {index < filteredData.length - 1 && (
                   <tr>

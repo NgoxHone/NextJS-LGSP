@@ -157,8 +157,38 @@ const menuGroups = [
             </g>
           </svg>
         ),
-        label: <p style={{ fontFamily: 'sans-serif' }}>Chi tiết dịch vụ</p>,
+        label: <p style={{ fontFamily: 'sans-serif' }}>Chi tiết dịch vụ Request</p>,
         route: "/details",
+      },
+      {
+        icon: (
+          // <svg
+          //   className="fill-current"
+          //   width="18"
+          //   height="18"
+          //   viewBox="0 0 18 18"
+          //   fill="none"
+          //   xmlns="http://www.w3.org/2000/svg"
+          //   stroke="#f0f0f0"
+          // >
+          //   <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+          //   <g
+          //     id="SVGRepo_tracerCarrier"
+          //     strokeLinecap="round"
+          //     strokeLinejoin="round"
+          //   ></g>
+          //   <g id="SVGRepo_iconCarrier">
+          //     <path d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.002 14H4z"></path>
+          //     <path d="M6 7h12v2H6zm0 4h12v2H6zm0 4h6v2H6z"></path>
+          //   </g>
+          // </svg>
+          <svg
+            width="18"
+            height="18"
+            fill="#f0f0f0" viewBox="0 0 36 36" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>details-line</title> <path d="M32,6H4A2,2,0,0,0,2,8V28a2,2,0,0,0,2,2H32a2,2,0,0,0,2-2V8A2,2,0,0,0,32,6Zm0,22H4V8H32Z" class="clr-i-outline clr-i-outline-path-1"></path><path d="M9,14H27a1,1,0,0,0,0-2H9a1,1,0,0,0,0,2Z" class="clr-i-outline clr-i-outline-path-2"></path><path d="M9,18H27a1,1,0,0,0,0-2H9a1,1,0,0,0,0,2Z" class="clr-i-outline clr-i-outline-path-3"></path><path d="M9,22H19a1,1,0,0,0,0-2H9a1,1,0,0,0,0,2Z" class="clr-i-outline clr-i-outline-path-4"></path> <rect x="0" y="0" width="36" height="36" fill-opacity="0"></rect> </g></svg>
+        ),
+        label: <p style={{ fontFamily: 'sans-serif' }}>Chi tiết dịch vụ Response</p>,
+        route: "/detailsResponse",
       },
       // {
       //   icon: (

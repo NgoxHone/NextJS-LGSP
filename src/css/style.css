@@ -304,7 +304,7 @@ input[type="search"]::-webkit-search-cancel-button {
   position: absolute;
   top: 0;
   left: 0;
-  border-color: #3C50E0;
+  border-color: #3c50e0;
   /* border-radius: 0.5rem; Rounded-lg */
   border-style: solid;
   transition: all 0.5s;
@@ -350,7 +350,7 @@ input[type="search"]::-webkit-search-cancel-button {
   width: 0;
 }
 .checkbox.style-d input:checked ~ .checkbox__checkmark {
-  background-color: #3C50E0;
+  background-color: #3c50e0;
 }
 .checkbox.style-d input:checked ~ .checkbox__checkmark:after {
   opacity: 1;
@@ -359,10 +359,10 @@ input[type="search"]::-webkit-search-cancel-button {
   background-color: #eee;
 }
 .checkbox.style-d:hover input:checked ~ .checkbox__checkmark {
-  background-color: #3C50E0;
+  background-color: #3c50e0;
 }
 .checkbox.style-d:hover input ~ .checkbox__body {
-  color: #3C50E0;
+  color: #3c50e0;
 }
 .checkbox.style-d .checkbox__checkmark {
   position: absolute;
@@ -392,4 +392,46 @@ input[type="search"]::-webkit-search-cancel-button {
   line-height: 1.4;
   font-size: 16px;
   transition: color 0.25s ease;
+}
+.table-row {
+  transition: background-color 0.3s ease;
+}
+
+.table-row:hover {
+  background-color: #f7fafc; /* Màu xám nhạt khi hover */
+}
+
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.pagination li {
+  margin: 0 4px;
+}
+
+.pagination li a {
+  display: block;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  color: #0070f3;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pagination li a:hover {
+  background-color: #e0e0e0;
+}
+
+.pagination .active a {
+  background-color: #0070f3;
+  color: white;
+  border-color: #0070f3;
+}
+
+.pagination .disabled a {
+  color: #ccc;
+  cursor: not-allowed;
 }

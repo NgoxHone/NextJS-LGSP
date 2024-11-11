@@ -8,6 +8,8 @@ import { dataOption, dataOptionApp } from "../Chat/body";
 import { bodyLog } from "./body";
 import axios from "axios";
 import SelectGroupTwo from "../SelectGroup/SelectGroupTwo";
+import ReactPaginate from "react-paginate"; // Import react-paginate
+
 import {
   convertDateToMilliseconds,
   formatTimestampToDate,
@@ -129,8 +131,8 @@ const DetailServices: React.FC = () => {
   const handleSelectAppChange = (value: string) => {
     setSelectedOptionApp(value);
   };
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+  const handlePageChange = (selectedPage) => {
+    setPage(selectedPage); // Đặt trang mới
   };
   console.log("dt", data);
   return (
@@ -208,11 +210,10 @@ const DetailServices: React.FC = () => {
         <div className="flex flex-col">
           {data?.hits?.hits?.map((brand, key) => (
             <div
-              className={` ${
-                key === data?.hits?.hits?.length - 1
+              className={` ${key === data?.hits?.hits?.length - 1
                   ? ""
                   : "border-b border-stroke dark:border-strokedark"
-              }`}
+                }`}
               key={key}
             >
               <div className="flex items-center gap-1 p-2.5 xl:p-5">
@@ -246,29 +247,23 @@ const DetailServices: React.FC = () => {
           ))}
         </div>
         <div className="mt-4 flex justify-center gap-2 mb-10">
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 0}
-            className={`rounded-md px-4 py-2 transition-all duration-200 ${
-              page === 0
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Trang trước
-          </button>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            disabled={(page + 1) * itemsPerPage >= totalItems}
-            className={`rounded-md px-4 py-2 transition-all duration-200 ${
-              (page + 1) * itemsPerPage >= totalItems
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Trang sau
-          </button>
+          <ReactPaginate
+            previousLabel={"Trang trước"}
+            nextLabel={"Trang sau"}
+            breakLabel={"..."}
+            breakClassName={"break-me"}
+            pageCount={Math.ceil(totalItems / itemsPerPage)} // Tổng số trang
+            marginPagesDisplayed={2} // Số trang hiển thị ở đầu và cuối
+            pageRangeDisplayed={5} // Số trang hiển thị xung quanh trang hiện tại
+            onPageChange={(selectedItem) => handlePageChange(selectedItem.selected)} // Cập nhật page
+            containerClassName={"pagination"} // Lớp CSS cho container phân trang
+            activeClassName={"active"} // Lớp CSS cho trang đang hoạt động
+            previousClassName={"prev-page"}
+            nextClassName={"next-page"}
+            disabledClassName={"disabled"}
+          />
         </div>
+
       </div>
     </div>
   );

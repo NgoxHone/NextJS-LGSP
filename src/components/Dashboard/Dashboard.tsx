@@ -212,23 +212,56 @@ const ECommerce = () => {
       );
 
       // Cập nhật lại dữ liệu khi API 2 hoàn thành
-      const mapCorrelationCounts = (api1Data, api2Data) => {
+      const orderedKeys = ["DKDN", "CSDL_DanCu", "BHXH", "CSDL_DATDAI", "CSDL_CCVC", "VBQPPL", "CSDL_GIA", "CSDL_ĐKPT", "DVC-GPLX", "LLTP-VNeID", "QuanLyHoTich", "CapMSDVQHNS", "DMDC", "TNMT_Thue", "BoGTVT", "DVC_BoXayDung", "DVC_BTXH", "DMDC_BTC", "DMDC-NHNN", "VNPOST", "vpostcode", "EVN", "SSO.VNeID", "HTTTNTW"];
+      const mapCorrelationCounts = (api1Data, api2Data, orderedKeys) => {
         const api1Buckets = api1Data.aggregations.group_by_api.buckets;
         const api2Buckets = api2Data.aggregations.group_by_api.buckets;
+
+        // Tạo Map từ `api2Buckets` để truy xuất nhanh `unique_correlation_count` theo `key`
         const api2Map = new Map();
         api2Buckets.forEach((bucket) => {
           api2Map.set(bucket.key, bucket.unique_correlation_count.value);
         });
-        const updatedApi1Buckets = api1Buckets.map((bucket) => {
-          const correlationCount = api2Map.get(bucket.key) || 0;
-          return {
-            ...bucket,
-            unique_correlation_count: {
-              ...bucket.unique_correlation_count,
-              value: correlationCount,
-            },
-          };
+
+        // Tạo Map từ `api1Buckets` để dễ kiểm tra sự tồn tại của `key`
+        const api1Map = new Map(api1Buckets.map((bucket) => [bucket.key, bucket]));
+
+        // Cập nhật `api1Buckets` với `unique_correlation_count` từ `api2Map` hoặc thêm mới từ `orderedKeys`
+        let updatedApi1Buckets = orderedKeys.map((key) => {
+          if (api1Map.has(key)) {
+            // Nếu `key` đã tồn tại trong `api1Buckets`, cập nhật `unique_correlation_count`
+            const bucket = api1Map.get(key);
+            const correlationCount = api2Map.get(key) || 0;
+            return {
+              ...bucket,
+              unique_correlation_count: {
+                ...bucket.unique_correlation_count,
+                value: correlationCount,
+              },
+            };
+          } else {
+            // Nếu `key` không tồn tại trong `api1Buckets`, tạo mới với các giá trị `0`
+            return {
+              key: key,
+              doc_count: 0,
+              by_failure: {
+                meta: {},
+                doc_count: 0,
+                unique_failure_count: {
+                  value: 0,
+                },
+              },
+              unique_correlation_count: {
+                value: 0,
+              },
+            };
+          }
         });
+
+        // Thêm các `bucket` còn lại không có trong `orderedKeys` vào cuối
+        updatedApi1Buckets = updatedApi1Buckets.concat(
+          api1Buckets.filter((bucket) => !orderedKeys.includes(bucket.key))
+        );
 
         return {
           ...api1Data,
@@ -242,7 +275,9 @@ const ECommerce = () => {
         };
       };
 
-      const updatedApi1Data = mapCorrelationCounts(response1, response2);
+
+      const updatedApi1Data = mapCorrelationCounts(response1, response2, orderedKeys);
+      console.log("====>", updatedApi1Data)
       setDocuments(updatedApi1Data); // Cập nhật giao diện với dữ liệu kết hợp
 
     } catch (error) {
@@ -536,6 +571,8 @@ const ECommerce = () => {
   // console.log("--->", correlationIds2.length)
 
   // console.log(matchingCount2)
+
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
