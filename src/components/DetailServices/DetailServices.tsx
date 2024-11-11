@@ -30,6 +30,7 @@ const DetailServices: React.FC = () => {
   const itemsPerPage = 30; // Số lượng bản ghi mỗi trang
   const handleDateChange = (e, setDate) => {
     setDate(e.target.value);
+    setPage(0)
   };
 
   console.log(
@@ -64,7 +65,15 @@ const DetailServices: React.FC = () => {
         ),
       });
       const dataRes = response.data;
-
+      console.log("ressss", bodyLog(
+        selectedEnv,
+        selectedOption,
+        selectedOptionApp,
+        convertDateToMilliseconds(startDate),
+        convertDateToMilliseconds(endDate),
+        page * itemsPerPage,
+        itemsPerPage,
+      ),);
       setData(dataRes);
       setTotalItems(dataRes.hits.total.value); // Lưu tổng số item
     } catch (error) {
@@ -127,12 +136,16 @@ const DetailServices: React.FC = () => {
   // Hàm xử lý khi người dùng chọn một giá trị mới từ dropdown
   const handleSelectChange = (value: string) => {
     setSelectedOption(value);
+    setPage(0)
   };
   const handleSelectAppChange = (value: string) => {
     setSelectedOptionApp(value);
+    setPage(0)
+
   };
   const handlePageChange = (selectedPage) => {
     setPage(selectedPage); // Đặt trang mới
+    
   };
   console.log("dt", data);
   return (
@@ -210,10 +223,11 @@ const DetailServices: React.FC = () => {
         <div className="flex flex-col">
           {data?.hits?.hits?.map((brand, key) => (
             <div
-              className={` ${key === data?.hits?.hits?.length - 1
+              className={` ${
+                key === data?.hits?.hits?.length - 1
                   ? ""
                   : "border-b border-stroke dark:border-strokedark"
-                }`}
+              }`}
               key={key}
             >
               <div className="flex items-center gap-1 p-2.5 xl:p-5">
@@ -246,7 +260,7 @@ const DetailServices: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="mt-4 flex justify-center gap-2 mb-10">
+        <div className="mb-10 mt-4 flex justify-center gap-2">
           <ReactPaginate
             previousLabel={"Trang trước"}
             nextLabel={"Trang sau"}
@@ -255,15 +269,17 @@ const DetailServices: React.FC = () => {
             pageCount={Math.ceil(totalItems / itemsPerPage)} // Tổng số trang
             marginPagesDisplayed={2} // Số trang hiển thị ở đầu và cuối
             pageRangeDisplayed={5} // Số trang hiển thị xung quanh trang hiện tại
-            onPageChange={(selectedItem) => handlePageChange(selectedItem.selected)} // Cập nhật page
+            onPageChange={(selectedItem) =>
+              handlePageChange(selectedItem.selected)
+            } // Cập nhật page
             containerClassName={"pagination"} // Lớp CSS cho container phân trang
             activeClassName={"active"} // Lớp CSS cho trang đang hoạt động
             previousClassName={"prev-page"}
             nextClassName={"next-page"}
             disabledClassName={"disabled"}
+            forcePage={page}
           />
         </div>
-
       </div>
     </div>
   );

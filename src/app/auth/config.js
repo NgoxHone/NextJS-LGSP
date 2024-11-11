@@ -1,4 +1,4 @@
-const NUMB = 0;
+const NUMB = 1;
 const URL_ARR = ["http://localhost:3000", "https://thongkelgsp.cqdtcamau.vn/"];
 export const CONFIG = {
   REDIRECT_URI: URL_ARR[NUMB],

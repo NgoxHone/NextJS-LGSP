@@ -3,32 +3,41 @@ import React, { useState } from "react";
 interface SelectGroupTwoProps {
   label: string;
   options: Array<{ value: string; label: string }>;
-  onSelect: (value: string) => void;  // Hàm callback khi có sự thay đổi
+  onSelect: (value: string) => void; // Hàm callback khi có sự thay đổi
+  init: string;
 }
 
-const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({ label, options, onSelect }) => {
-  const [selectedOption, setSelectedOption] = useState<string>("--");
+const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({
+  label,
+  options,
+  onSelect,
+  init = "--",
+}) => {
+  const [selectedOption, setSelectedOption] = useState<string>(init);
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = e.target.value;
     setSelectedOption(newValue);
     setIsOptionSelected(true);
-    onSelect(newValue);  // Gọi callback với giá trị mới
+    onSelect(newValue); // Gọi callback với giá trị mới
   };
 
   return (
     <div>
-      <label style={{ fontFamily: 'sans-serif' }} className="block text-sm font-medium text-black dark:text-white">
+      <label
+        style={{ fontFamily: "sans-serif" }}
+        className="block text-sm font-medium text-black dark:text-white"
+      >
         {label}
       </label>
       <div className="relative z-20 bg-white dark:bg-form-input">
         <select
           value={selectedOption}
           onChange={handleChange}
-          className={`relative h-13 z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
+          className={`relative z-20 h-13 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
         >
-          <option style={{ fontFamily: 'sans-serif' }} value="" disabled>
+          <option style={{ fontFamily: "sans-serif" }} value="" disabled>
             {label}
           </option>
           {options?.map((option) => (
@@ -60,6 +69,5 @@ const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({ label, options, onSelec
     </div>
   );
 };
-
 
 export default SelectGroupTwo;
