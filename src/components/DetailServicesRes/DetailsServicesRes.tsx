@@ -263,7 +263,7 @@ const DetailServicesRes: React.FC = () => {
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">STT</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Thời gian</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Mã thông báo</th>
-                                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">API</th>
+                                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Dịch vụ</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Mô tả</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Phần mềm</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Thông báo</th>
@@ -281,15 +281,16 @@ const DetailServicesRes: React.FC = () => {
                                     <td className={`border border-stroke dark:border-strokedark p-3 font-medium text-center ${getStatusStyles(brand?._source?.http_status_code)}`}>
                                         {brand?._source?.http_status_code}
                                     </td>
-                                    <td className="border border-stroke dark:border-strokedark p-3 font-medium text-orange-400 dark:text-orange-400">
-                                        {brand?._source?.application_name}
+                                    <td className="border border-stroke dark:border-strokedark p-3 font-medium text-blue-600 dark:text-blue-400">
+                                        {brand?._source?.api} - {brand?._source.am_key_type}
                                     </td>
+
                                     <td className="border border-stroke dark:border-strokedark p-3 text-black dark:text-white" style={{ fontFamily: "sans-serif" }}>
                                         {getDatabaseDescription(brand?._source?.api)}
                                     </td>
 
-                                    <td className="border border-stroke dark:border-strokedark p-3 font-medium text-blue-600 dark:text-blue-400">
-                                        {brand?._source?.api} - {brand?._source.am_key_type}
+                                    <td className="border border-stroke dark:border-strokedark p-3 font-medium text-orange-400 dark:text-orange-400">
+                                        {brand?._source?.application_name}
                                     </td>
 
                                     <td className="border border-stroke dark:border-strokedark p-3 font-medium text-green-600 dark:text-green-600">
