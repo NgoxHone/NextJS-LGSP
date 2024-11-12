@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface SelectGroupTwoProps {
   label: string;
   options: Array<{ value: string; label: string }>;
-  onSelect: (value: string) => void; // Hàm callback khi có sự thay đổi
+  onSelect: (value: string) => void;
   init: string;
 }
 
@@ -16,31 +16,42 @@ const SelectGroupTwo: React.FC<SelectGroupTwoProps> = ({
   const [selectedOption, setSelectedOption] = useState<string>(init);
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
+  // Update selectedOption state when `init` prop changes
+  useEffect(() => {
+    setSelectedOption(init);
+    setIsOptionSelected(init !== "");
+  }, [init]);
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = e.target.value;
     setSelectedOption(newValue);
     setIsOptionSelected(true);
-    onSelect(newValue); // Gọi callback với giá trị mới
+    onSelect(newValue); // Invoke callback with the new value
   };
 
   return (
     <div>
-      <label
-        style={{ fontFamily: "sans-serif" }}
-        className="block text-sm font-medium text-black dark:text-white"
-      >
-        {label}
-      </label>
+      {label && (
+        <label
+          style={{ fontFamily: "sans-serif" }}
+          className="block text-sm font-medium text-black dark:text-white"
+        >
+          {label}
+        </label>
+      )}
       <div className="relative z-20 bg-white dark:bg-form-input">
         <select
           value={selectedOption}
           onChange={handleChange}
-          className={`relative z-20 h-13 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${isOptionSelected ? "text-black dark:text-white" : ""}`}
+          aria-label={label || "Select option"}
+          className={`relative z-20 h-13 w-full appearance-none rounded-lg border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
+            isOptionSelected ? "text-black dark:text-white" : ""
+          }`}
         >
           <option style={{ fontFamily: "sans-serif" }} value="" disabled>
             {label}
           </option>
-          {options?.map((option) => (
+          {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

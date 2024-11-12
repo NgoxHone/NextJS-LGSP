@@ -3,7 +3,7 @@ import Image from "next/image";
 import DropdownDefault from "../Dropdowns/DropdownDefault";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { optionEnviroment, optionService } from "../../../utilities/Atom/atom";
+import { optionEnviroment, optionService, selectService } from "../../../utilities/Atom/atom";
 import { dataOption, dataOptionApp } from "../Chat/body";
 import { bodyLog } from "./body";
 import axios from "axios";
@@ -18,8 +18,8 @@ import {
 const DetailServices: React.FC = () => {
   const [optionData, setOptionData] = useRecoilState(optionService);
   const [optionDataApp, setOptionDataApp] = useState([]);
-
-  const [selectedOption, setSelectedOption] = useState("Tất cả");
+  const [isParamsLoaded, setIsParamsLoaded] = useState(false); // State to check if params are loaded
+  const [selectedOption, setSelectedOption] = useRecoilState(selectService);
   const [selectedOptionApp, setSelectedOptionApp] = useState("Tất cả");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -120,16 +120,34 @@ const DetailServices: React.FC = () => {
     fetchOption();
     fetchOptionApp();
   }, [selectedEnv]);
-
   useEffect(() => {
-    fetchData();
+    // Load parameters from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const startDay = urlParams.get("startDay");
+    const endDay = urlParams.get("endDay");
+
+    // Set parameters from URL
+    setStartDate(startDay);
+    setEndDate(endDay);
+
+    // Indicate that parameters have been loaded
+    setIsParamsLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (isParamsLoaded) {
+      const delay = setTimeout(() => {
+        fetchData();
+      }, 1000);
+
+      return () => clearTimeout(delay); // Cleanup timeout if dependencies change
+    }
   }, [
     selectedOption,
     selectedEnv,
     selectedOptionApp,
     startDate,
     endDate,
-    page,
+    page, isParamsLoaded
   ]);
 
   console.log(selectedOption);
@@ -145,7 +163,7 @@ const DetailServices: React.FC = () => {
   };
   const handlePageChange = (selectedPage) => {
     setPage(selectedPage); // Đặt trang mới
-    
+
   };
   console.log("dt", data);
   return (
@@ -163,6 +181,7 @@ const DetailServices: React.FC = () => {
               <p style={{ fontFamily: "sans-serif" }}>Dịch vụ</p>
               {optionData != null && (
                 <SelectGroupTwo
+                  init={selectedOption}
                   onSelect={handleSelectChange}
                   label=""
                   options={[
@@ -220,46 +239,57 @@ const DetailServices: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col">
-          {data?.hits?.hits?.map((brand, key) => (
-            <div
-              className={` ${
-                key === data?.hits?.hits?.length - 1
-                  ? ""
-                  : "border-b border-stroke dark:border-strokedark"
-              }`}
-              key={key}
-            >
-              <div className="flex items-center gap-1 p-2.5 xl:p-5">
-                <p className="hidden items-start font-medium text-black dark:text-white sm:block">
-                  {key + 1}.
-                </p>
-                <div className="items-center p-2.5 xl:p-5">
-                  <p style={{ color: "gray", fontWeight: "bold" }}>
-                    <span
-                      style={{ textAlign: "right", fontStyle: "italic" }}
-                      className="text-gray-200 dark:text-gray-400 text-sm"
-                    >
-                      {formatTimestampToDate(brand?._source.date_created)}
-                    </span>
-                  </p>
-                  <p style={{ fontFamily: "sans-serif" }}>
-                    {getDatabaseDescription(brand?._source?.api)}
-                  </p>
-                  <p className="font-medium text-blue-600 dark:text-blue-400">
+        <div className="w-full overflow-auto">
+          <table className="min-w-full border-collapse border border-stroke dark:border-strokedark">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-gray-700">
+                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">STT</th>
+                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Thời gian</th>
+                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Dịch vụ</th>
+                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Mô tả</th>
+                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Phần mềm</th>
+                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Full Request Path</th>
+                {/* <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Header</th> */}
+
+              </tr>
+            </thead>
+            <tbody>
+              {data?.hits?.hits?.map((brand, index) => (
+                <tr key={index} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-900'}`}>
+                  <td className="border border-stroke dark:border-strokedark p-3 text-black dark:text-white font-medium">
+                    {index + 1}.
+                  </td>
+                  <td className="border border-stroke dark:border-strokedark p-3 text-gray-500 dark:text-gray-400 italic text-sm">
+                    {formatTimestampToDate(brand?._source.date_created)}
+                  </td>
+                  <td className="border border-stroke dark:border-strokedark p-3 font-medium text-blue-600 dark:text-blue-400">
                     {brand?._source?.api} - {brand?._source.am_key_type}
-                  </p>
-                  <p className="font-medium text-green-600 dark:text-green-600">
-                    {brand?._source?.full_request_path}
-                  </p>
-                  <p className="font-medium text-orange-400 dark:text-orange-400">
+                  </td>
+                  <td className="border border-stroke dark:border-strokedark p-3 text-black dark:text-white" style={{ fontFamily: "sans-serif" }}>
+                    {getDatabaseDescription(brand?._source?.api)}
+                  </td>
+
+                  <td className="border border-stroke dark:border-strokedark p-3 font-medium text-orange-400 dark:text-orange-400">
                     {brand?._source?.application_name}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td className="border border-stroke dark:border-strokedark p-3 font-medium text-green-600 dark:text-green-600">
+                    {brand?._source?.full_request_path}
+                  </td>
+                  {/* <td
+                    className="border border-stroke dark:border-strokedark p-3 font-medium text-green-600 dark:text-green-600 truncate max-w-xs"
+                    title={brand?._source?.headers}
+                  >
+                    {brand?._source?.headers?.length > 30
+                      ? brand?._source?.headers.slice(0, 30) + "..."
+                      : brand?._source?.headers}
+                  </td> */}
+
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+
         <div className="mb-10 mt-4 flex justify-center gap-2">
           <ReactPaginate
             previousLabel={"Trang trước"}

@@ -16,6 +16,7 @@ import {
   optionOptionApp,
   optionService,
   selectService,
+  status,
 } from "../../../utilities/Atom/atom";
 import { useRecoilState } from "recoil";
 import arrowRightIcon from "../../acsset/button-arrow-right-1.png";
@@ -47,6 +48,8 @@ const Table = ({
   };
 
   const [_, setSelectedOption3] = useRecoilState(selectService);
+  const [_s, setStatus] = useRecoilState(status);
+
   const [matchingCount, setMatchingCount] = useRecoilState(matchingCountState);
   const [matchingCount2, setMatchingCount2] =
     useRecoilState(matchingCountState2);
@@ -326,10 +329,7 @@ const Table = ({
                   >
                     thất bại
                   </th>
-                  <th
-                    style={{ textAlign: "center" }}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase dark:bg-meta-4 xsm:text-sm"
-                  ></th>
+
                 </>
               )}
             </tr>
@@ -369,7 +369,16 @@ const Table = ({
                     {/* {!lienthong
                       ? bucket?.doc_count?.toLocaleString()
                       : bucket?.unique_correlation_count?.value?.toLocaleString()} */}
-                    {lienthong && "Tổng:"} {bucket?.doc_count?.toLocaleString()}
+                    <Link
+                      onClick={() => {
+                        setSelectedOption3(bucket.key);
+                      }}
+                      href={`/details?startDay=${startDate}&endDay=${endDate}`}
+                      className="hover:text-blue-600 hover:underline"
+                    >
+                      {lienthong && "Tổng:"} {bucket?.doc_count?.toLocaleString()}
+
+                    </Link>
                     {lienthong &&
                       index == 0 &&
                       matchingCount != 0 &&
@@ -391,7 +400,7 @@ const Table = ({
                             {Math.round(
                               ((bucket?.doc_count - matchingCount) /
                                 bucket?.doc_count) *
-                                100,
+                              100,
                             ).toLocaleString() + "%"}
                             )
                           </p>
@@ -411,7 +420,7 @@ const Table = ({
                             {Math.round(
                               ((bucket?.doc_count - matchingCount2) /
                                 bucket?.doc_count) *
-                                100,
+                              100,
                             ).toLocaleString() + "%"}
                             )
                           </p>
@@ -432,38 +441,44 @@ const Table = ({
                         style={{ fontWeight: "bold", textAlign: "center" }}
                         className="px-6 py-3 text-left"
                       >
-                        {" "}
-                        {(() => {
-                          // Destructure values for better readability
-                          const uniqueCount =
-                            bucket?.unique_correlation_count?.value;
-                          const docCount = bucket?.doc_count;
+                        <Link
+                          onClick={() => {
+                            setSelectedOption3(bucket.key);
+                            setStatus("1");
+                          }}
+                          href={`/detailsResponse?startDay=${startDate}&endDay=${endDate}`}
+                          className="hover:text-blue-600 hover:underline"
+                        >
+                          {" "}
+                          {(() => {
+                            // Destructure values for better readability
+                            const uniqueCount = bucket?.unique_correlation_count?.value;
+                            const docCount = bucket?.doc_count;
 
-                          // Determine what to display
-                          if (uniqueCount > docCount) {
-                            return docCount.toLocaleString(); // Show doc_count if unique_count exceeds it
-                          } else if (uniqueCount) {
-                            return uniqueCount.toLocaleString(); // Show unique_count if it exists
-                          } else {
-                            return "0"; // Fallback value if both counts are not present
-                          }
-                        })()}
-                        {"\n"}
-                        {/* {bucket?.unique_correlation_count?.value > bucket?.doc_count ? bucket?.doc_count : bucket?.doc_count ? bucket?.unique_correlation_count?.value.toLocaleString()}{"\n"} */}
-                        (
-                        {
-                          bucket?.doc_count > 0
+                            // Determine what to display
+                            if (uniqueCount > docCount) {
+                              return docCount.toLocaleString(); // Show doc_count if unique_count exceeds it
+                            } else if (uniqueCount) {
+                              return uniqueCount.toLocaleString(); // Show unique_count if it exists
+                            } else {
+                              return "0"; // Fallback value if both counts are not present
+                            }
+                          })()}
+                          {"\n"}
+                          (
+                          {bucket?.doc_count > 0
                             ? Math.round(
-                                ((bucket?.unique_correlation_count?.value >
-                                bucket?.doc_count
-                                  ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
-                                  : bucket?.unique_correlation_count?.value) /
-                                  bucket?.doc_count) *
-                                  100,
-                              ).toLocaleString() + "%"
-                            : "0%" // Return "0%" if doc_count is 0 or undefined
-                        }
-                        )
+                              ((bucket?.unique_correlation_count?.value > bucket?.doc_count
+                                ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
+                                : bucket?.unique_correlation_count?.value) /
+                                bucket?.doc_count) *
+                              100,
+                            ).toLocaleString() + "%"
+                            : "0%"}
+                          )
+                        </Link>
+
+
                         {/* {bucket?.unique_correlation_count?.value.toLocaleString()}{"\n"}
                         ({
                           bucket?.unique_correlation_count?.value > 0
@@ -479,49 +494,63 @@ const Table = ({
                         style={{ fontWeight: "bold", textAlign: "center" }}
                         className="px-6 py-3 text-left"
                       >
-                        {bucket?.unique_correlation_count?.value >
-                        bucket?.doc_count
-                          ? 0
-                          : (
+
+                        <Link
+                          onClick={() => {
+                            setSelectedOption3(bucket.key);
+                            setStatus("0")
+                          }}
+                          href={`/detailsResponse?startDay=${startDate}&endDay=${endDate}`}
+                          className="hover:text-blue-600 hover:underline"
+
+                        // className="arrow-button"
+                        >
+                          {/* Thay chữ bằng SVG icon mũi tên */}
+                          {bucket?.unique_correlation_count?.value >
+                            bucket?.doc_count
+                            ? 0
+                            : (
                               bucket?.doc_count -
                               (bucket?.unique_correlation_count?.value || 0)
                             ).toLocaleString()}
-                        <br />(
-                        {
-                          !bucket?.unique_correlation_count?.value >
-                          bucket?.doc_count
-                            ? "100%" // If unique_correlation_count exceeds doc_count, display 100%
-                            : bucket?.unique_correlation_count?.value > 0
-                              ? (() => {
+                          <br />(
+                          {
+                            !bucket?.unique_correlation_count?.value >
+                              bucket?.doc_count
+                              ? "100%" // If unique_correlation_count exceeds doc_count, display 100%
+                              : bucket?.unique_correlation_count?.value > 0
+                                ? (() => {
                                   // Calculate the percentage
                                   const percentage =
                                     100 -
                                     Math.round(
                                       (bucket?.unique_correlation_count?.value /
                                         bucket?.doc_count) *
-                                        100,
+                                      100,
                                     );
                                   // Return 0% if the calculated percentage is less than 0
                                   return percentage < 0
                                     ? "0%"
                                     : percentage.toLocaleString() + "%";
                                 })() // IIFE for inline calculation
-                              : "0%" // If unique_correlation_count is 0 or not present, display 0%
-                        }
-                        )
+                                : "0%" // If unique_correlation_count is 0 or not present, display 0%
+                          }
+                          )
+                        </Link>
+
+
                       </td>
                     </>
                   )}
 
                   {/* Thêm lớp "arrow-button" để style */}
-                  {!lienthong && (
+                  {/* {!lienthong && (
                     <td>
                       <Link
                         onClick={() => setSelectedOption3(bucket.key)}
                         href="/detailsResponse"
                         className="arrow-button"
                       >
-                        {/* Thay chữ bằng SVG icon mũi tên */}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -539,7 +568,7 @@ const Table = ({
                         </svg>
                       </Link>
                     </td>
-                  )}
+                  )} */}
                 </tr>
                 {index < filteredData.length - 1 && (
                   <tr>

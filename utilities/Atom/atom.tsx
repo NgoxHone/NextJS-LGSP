@@ -43,3 +43,9 @@ export const selectService = atom({
   key: 'SelectService', // Mỗi atom phải có một key duy nhất
   default: 0, // Giá trị mặc định ban đầu
 });
+
+
+export const status = atom({
+  key: 'Status', // Mỗi atom phải có một key duy nhất
+  default: "Tất cả", // Giá trị mặc định ban đầu
+});

@@ -228,6 +228,8 @@ export function getDatabaseDescription(id) {
       return "Phần mềm dữ liệu giao thông";
     case "vpostcode":
       return "Hệ thống mã bưu chính Vpostcode  (Tổng Công ty  Bưu điện Việt  Nam)";
+    case "CSDL_ĐKPT":
+      return "Cơ sở dữ liệu đăng kiểm phương tiện (Bộ Giao thông vận  tải) - chưa tích hợp";
     default:
       return id;
   }
