@@ -38,7 +38,17 @@ const Table = ({
   const { aggregations } = data;
   const getTodayDate = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0];
+    today.setHours(23, 59, 59, 999);
+  
+    // Add 24 hours (in milliseconds) to get the end of tomorrow
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+  
+    // Convert to ISO string and adjust for timezone
+    const localISOTime = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, -1);
+  
+    return localISOTime;
   };
 
   const getLastMonthDate = () => {
