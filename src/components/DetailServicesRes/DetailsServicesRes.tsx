@@ -259,14 +259,16 @@ const DetailServicesRes: React.FC = () => {
                 <div className="w-full overflow-auto">
                     <table className="min-w-full border-collapse border border-stroke dark:border-strokedark">
                         <thead>
-                            <tr className="bg-gray-100 dark:bg-gray-700">
+                            <tr style={{ fontFamily: "sans-serif" }} className="bg-gray-100 dark:bg-gray-700">
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">STT</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Thời gian</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Mã thông báo</th>
+                                <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Trạng thái</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Dịch vụ</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Mô tả</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Phần mềm</th>
                                 <th className="border border-stroke dark:border-strokedark p-3 text-left font-medium text-black dark:text-white">Thông báo</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -281,6 +283,9 @@ const DetailServicesRes: React.FC = () => {
                                     <td className={`border border-stroke dark:border-strokedark p-3 font-medium text-center ${getStatusStyles(brand?._source?.http_status_code)}`}>
                                         {brand?._source?.http_status_code}
                                     </td>
+                                    <td className={`border border-stroke dark:border-strokedark p-3 font-medium text-center`}>
+                                        {brand?._source?.isSuccess ? "Thành công" : "Thất bại"}
+                                    </td>
                                     <td className="border border-stroke dark:border-strokedark p-3 font-medium text-blue-600 dark:text-blue-400">
                                         {brand?._source?.api} - {brand?._source.am_key_type}
                                     </td>
@@ -292,10 +297,10 @@ const DetailServicesRes: React.FC = () => {
                                     <td className="border border-stroke dark:border-strokedark p-3 font-medium text-orange-400 dark:text-orange-400">
                                         {brand?._source?.application_name}
                                     </td>
-
                                     <td className="border border-stroke dark:border-strokedark p-3 font-medium text-green-600 dark:text-green-600">
                                         {brand?._source?.error_message != "null" && brand?._source?.error_message}
                                     </td>
+
 
                                 </tr>
                             ))}
@@ -324,7 +329,7 @@ const DetailServicesRes: React.FC = () => {
                     />
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

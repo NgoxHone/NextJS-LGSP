@@ -374,10 +374,17 @@ const Table = ({
                         setSelectedOption3(bucket.key);
                       }}
                       href={`/details?startDay=${startDate}&endDay=${endDate}`}
-                      className="hover:text-blue-600 hover:underline"
+                    // className="hover:text-blue-600 hover:underline"
                     >
-                      {lienthong && "Tổng:"} {bucket?.doc_count?.toLocaleString()}
 
+
+                      {lienthong && "Tổng:"}
+                      <a
+                        style={{ color: lienthong ? 'black' : '' }}
+                        className={!lienthong ? "text-blue-600" : ""}
+                      >
+                        {bucket?.doc_count?.toLocaleString()}
+                      </a>
                     </Link>
                     {lienthong &&
                       index == 0 &&
@@ -441,14 +448,15 @@ const Table = ({
                         style={{ fontWeight: "bold", textAlign: "center" }}
                         className="px-6 py-3 text-left"
                       >
-                        <Link
+                        <Link className="text-blue-600"
                           onClick={() => {
                             setSelectedOption3(bucket.key);
                             setStatus("1");
                           }}
                           href={`/detailsResponse?startDay=${startDate}&endDay=${endDate}`}
-                          className="hover:text-blue-600 hover:underline"
+                        // className="hover:text-blue-600 hover:underline"
                         >
+
                           {" "}
                           {(() => {
                             // Destructure values for better readability
@@ -501,7 +509,8 @@ const Table = ({
                             setStatus("0")
                           }}
                           href={`/detailsResponse?startDay=${startDate}&endDay=${endDate}`}
-                          className="hover:text-blue-600 hover:underline"
+                          // className="hover:text-blue-600 hover:underline"
+                          className="text-blue-600"
 
                         // className="arrow-button"
                         >
