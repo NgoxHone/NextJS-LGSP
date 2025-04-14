@@ -186,6 +186,10 @@ const Table = ({
   useEffect(() => {
     onEndDateChange(endDate);
   }, [endDate, onEndDateChange]);
+  const totalRequestCount = filteredData?.reduce(
+    (sum, item) => sum + item.doc_count,
+    0,
+  );
   return (
     <div
       className="rounded-lg border border-stroke bg-white px-6 pb-4 pt-6 shadow-lg dark:border-strokedark dark:bg-boxdark sm:px-8 xl:pb-3"
@@ -324,9 +328,16 @@ const Table = ({
                 {app ? "Phần mềm" : "Dịch vụ"}
               </th>
 
-              <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
-                request
-              </th>
+              {
+                <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
+                  <div className="flex flex-col items-start">
+                    <span>Request</span>
+                    <span className="text-sm font-semibold text-blue-600">
+                      {totalRequestCount?.toLocaleString()}
+                    </span>
+                  </div>
+                </th>
+              }
               {!lienthong && !app && (
                 <>
                   <th
