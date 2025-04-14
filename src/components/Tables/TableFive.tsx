@@ -39,15 +39,17 @@ const Table = ({
   const getTodayDate = () => {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
-  
+
     // Add 24 hours (in milliseconds) to get the end of tomorrow
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-  
+
     // Convert to ISO string and adjust for timezone
-    const localISOTime = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000)
+    const localISOTime = new Date(
+      tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000,
+    )
       .toISOString()
       .slice(0, -1);
-  
+
     return localISOTime;
   };
 
@@ -339,7 +341,6 @@ const Table = ({
                   >
                     thất bại
                   </th>
-
                 </>
               )}
             </tr>
@@ -373,7 +374,7 @@ const Table = ({
                     {getDatabaseDescription(bucket?.key)}
                   </td>
                   <td
-                    style={{ fontWeight: "bold" }}
+                    style={{ fontWeight: "bold", textAlign: "center" }}
                     className={"px-6 py-3 text-left"}
                   >
                     {/* {!lienthong
@@ -384,13 +385,11 @@ const Table = ({
                         setSelectedOption3(bucket.key);
                       }}
                       href={`/details?startDay=${startDate}&endDay=${endDate}`}
-                    // className="hover:text-blue-600 hover:underline"
+                      // className="hover:text-blue-600 hover:underline"
                     >
-
-
                       {lienthong && "Tổng:"}
                       <a
-                        style={{ color: lienthong ? 'black' : '' }}
+                        style={{ color: lienthong ? "black" : "" }}
                         className={!lienthong ? "text-blue-600" : ""}
                       >
                         {bucket?.doc_count?.toLocaleString()}
@@ -417,7 +416,7 @@ const Table = ({
                             {Math.round(
                               ((bucket?.doc_count - matchingCount) /
                                 bucket?.doc_count) *
-                              100,
+                                100,
                             ).toLocaleString() + "%"}
                             )
                           </p>
@@ -437,7 +436,7 @@ const Table = ({
                             {Math.round(
                               ((bucket?.doc_count - matchingCount2) /
                                 bucket?.doc_count) *
-                              100,
+                                100,
                             ).toLocaleString() + "%"}
                             )
                           </p>
@@ -458,19 +457,20 @@ const Table = ({
                         style={{ fontWeight: "bold", textAlign: "center" }}
                         className="px-6 py-3 text-left"
                       >
-                        <Link className="text-blue-600"
+                        <Link
+                          className="text-blue-600"
                           onClick={() => {
                             setSelectedOption3(bucket.key);
                             setStatus("1");
                           }}
                           href={`/detailsResponse?startDay=${startDate}&endDay=${endDate}`}
-                        // className="hover:text-blue-600 hover:underline"
+                          // className="hover:text-blue-600 hover:underline"
                         >
-
                           {" "}
                           {(() => {
                             // Destructure values for better readability
-                            const uniqueCount = bucket?.unique_correlation_count?.value;
+                            const uniqueCount =
+                              bucket?.unique_correlation_count?.value;
                             const docCount = bucket?.doc_count;
 
                             // Determine what to display
@@ -482,20 +482,19 @@ const Table = ({
                               return "0"; // Fallback value if both counts are not present
                             }
                           })()}
-                          {"\n"}
-                          (
+                          {"\n"}(
                           {bucket?.doc_count > 0
                             ? Math.round(
-                              ((bucket?.unique_correlation_count?.value > bucket?.doc_count
-                                ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
-                                : bucket?.unique_correlation_count?.value) /
-                                bucket?.doc_count) *
-                              100,
-                            ).toLocaleString() + "%"
+                                ((bucket?.unique_correlation_count?.value >
+                                bucket?.doc_count
+                                  ? bucket?.doc_count // Use doc_count if unique_correlation_count exceeds doc_count
+                                  : bucket?.unique_correlation_count?.value) /
+                                  bucket?.doc_count) *
+                                  100,
+                              ).toLocaleString() + "%"
                             : "0%"}
                           )
                         </Link>
-
 
                         {/* {bucket?.unique_correlation_count?.value.toLocaleString()}{"\n"}
                         ({
@@ -512,52 +511,50 @@ const Table = ({
                         style={{ fontWeight: "bold", textAlign: "center" }}
                         className="px-6 py-3 text-left"
                       >
-
                         <Link
                           onClick={() => {
                             setSelectedOption3(bucket.key);
-                            setStatus("0")
+                            setStatus("0");
                           }}
                           href={`/detailsResponse?startDay=${startDate}&endDay=${endDate}`}
                           // className="hover:text-blue-600 hover:underline"
                           className="text-blue-600"
 
-                        // className="arrow-button"
+                          // className="arrow-button"
                         >
                           {/* Thay chữ bằng SVG icon mũi tên */}
                           {bucket?.unique_correlation_count?.value >
-                            bucket?.doc_count
+                          bucket?.doc_count
                             ? 0
                             : (
-                              bucket?.doc_count -
-                              (bucket?.unique_correlation_count?.value || 0)
-                            ).toLocaleString()}
+                                bucket?.doc_count -
+                                (bucket?.unique_correlation_count?.value || 0)
+                              ).toLocaleString()}
                           <br />(
                           {
                             !bucket?.unique_correlation_count?.value >
-                              bucket?.doc_count
+                            bucket?.doc_count
                               ? "100%" // If unique_correlation_count exceeds doc_count, display 100%
                               : bucket?.unique_correlation_count?.value > 0
                                 ? (() => {
-                                  // Calculate the percentage
-                                  const percentage =
-                                    100 -
-                                    Math.round(
-                                      (bucket?.unique_correlation_count?.value /
-                                        bucket?.doc_count) *
-                                      100,
-                                    );
-                                  // Return 0% if the calculated percentage is less than 0
-                                  return percentage < 0
-                                    ? "0%"
-                                    : percentage.toLocaleString() + "%";
-                                })() // IIFE for inline calculation
+                                    // Calculate the percentage
+                                    const percentage =
+                                      100 -
+                                      Math.round(
+                                        (bucket?.unique_correlation_count
+                                          ?.value /
+                                          bucket?.doc_count) *
+                                          100,
+                                      );
+                                    // Return 0% if the calculated percentage is less than 0
+                                    return percentage < 0
+                                      ? "0%"
+                                      : percentage.toLocaleString() + "%";
+                                  })() // IIFE for inline calculation
                                 : "0%" // If unique_correlation_count is 0 or not present, display 0%
                           }
                           )
                         </Link>
-
-
                       </td>
                     </>
                   )}

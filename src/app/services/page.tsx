@@ -1,7 +1,10 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useRecoilState } from "recoil";
-import { accessTokenState, optionEnviroment } from "../../../utilities/Atom/atom";
+import {
+  accessTokenState,
+  optionEnviroment,
+} from "../../../utilities/Atom/atom";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef, useState } from "react";
 import { data1 } from "../../components/Dashboard/body";
@@ -28,7 +31,9 @@ const getTodayDate = () => {
   const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
   // Convert to ISO string and adjust for timezone
-  const localISOTime = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000)
+  const localISOTime = new Date(
+    tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000,
+  )
     .toISOString()
     .slice(0, -1);
 
@@ -49,9 +54,7 @@ const ServicesPage = () => {
   const [endDate, setEndDate] = useState(
     convertDateToMilliseconds(getTodayDate()),
   );
-  const [startDate, setStartDate] = useState(
-    null
-  );
+  const [startDate, setStartDate] = useState(null);
   const handleStartDateChange = (date) => {
     setStartDate(convertDateToMilliseconds(date));
   };
@@ -62,8 +65,8 @@ const ServicesPage = () => {
   const fetchDocuments = () => {
     setLoading(true);
     fetchData(data1(startDate, endDate, selectedEnv), setDocuments).finally(
-      () => { },
-        setLoading(false),
+      () => {},
+      setLoading(false),
     );
   };
   useEffect(() => fetchDocuments(), [startDate, endDate, selectedEnv]);
@@ -76,14 +79,14 @@ const ServicesPage = () => {
           <Breadcrumb pageName="Dịch vụ" />
 
           <TableFive
-            // xuatEx={false}
+            xuatEx={false}
             loading={loading}
             onStartDateChange={handleStartDateChange}
             onEndDateChange={handleEndDateChange}
             data={documents}
             search={false}
-          // lienthong={false}
-          // title="Thống kê gửi nhận văn bản"
+            lienthong={false}
+            // title="Thống kê gửi nhận văn bản"
           />
         </DefaultLayout>
       )}
