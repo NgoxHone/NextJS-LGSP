@@ -41,7 +41,6 @@ const SignIn: React.FC = () => {
         });
 
         const data = await response.json();
-
         if (data.access_token) {
           const expiresAtTimestamp = Date.now() + data.expires_in * 1000;
           setAccessToken(data.access_token);
@@ -50,12 +49,15 @@ const SignIn: React.FC = () => {
           Cookies.set("accessToken", data.access_token, {
             expires: data.expires_in / 86400,
           });
+
           Cookies.set("idToken", data.id_token, {
             expires: data.expires_in / 86400,
           });
+
           Cookies.set("expiresAt", expiresAtTimestamp.toString(), {
             expires: data.expires_in / 86400,
           });
+
           if (typeof window !== "undefined") {
             window.history.replaceState(
               {},

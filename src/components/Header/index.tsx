@@ -24,7 +24,7 @@ const EnvironmentFilter = () => {
           onChange={() => handleCheckboxChange('ALL')}
         />
         <span style={{ fontFamily: 'sans-serif' }} className="checkbox__checkmark"></span>
-        <span style={{ fontFamily: 'sans-serif' }} className="checkbox__body">Tất cả</span>
+        <span style={{ fontFamily: 'sans-serif' }} className="checkbox__body dark:text-white">Tất cả</span>
       </label>
 
       {/* Checkbox Sandbox */}
@@ -35,7 +35,7 @@ const EnvironmentFilter = () => {
           onChange={() => handleCheckboxChange('SANDBOX')}
         />
         <span style={{ fontFamily: 'sans-serif' }} className="checkbox__checkmark"></span>
-        <span style={{ fontFamily: 'sans-serif' }} className="checkbox__body">Sandbox</span>
+        <span style={{ fontFamily: 'sans-serif' }} className="checkbox__body dark:text-white">Sandbox</span>
       </label>
 
       {/* Checkbox Product */}
@@ -46,7 +46,7 @@ const EnvironmentFilter = () => {
           onChange={() => handleCheckboxChange('PRODUCTION')}
         />
         <span style={{ fontFamily: 'sans-serif' }} className="checkbox__checkmark"></span>
-        <span style={{ fontFamily: 'sans-serif' }} className="checkbox__body">Product</span>
+        <span style={{ fontFamily: 'sans-serif' }} className="checkbox__body dark:text-white">Product</span>
       </label>
     </div>
   );
