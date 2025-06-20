@@ -21,6 +21,8 @@ import {
 import { useRecoilState } from "recoil";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { FaSearch } from "react-icons/fa";
 
 // Types
 interface Bucket {
@@ -114,6 +116,7 @@ const Table: React.FC<TableProps> = ({
   const [endDate, setEndDate] = useState<string>(getTodayDate());
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const router = useRouter();
 
   // Data fetching
   const fetchOptionApp = async () => {
@@ -234,10 +237,10 @@ const Table: React.FC<TableProps> = ({
         </th>
         <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
           <div className="flex flex-col items-start">
-            <span>Request</span>
-            <span className="text-sm font-semibold text-blue-600">
+            <span>Request <p className="text-sm font-semibold text-blue-600 text-center">
               {totalRequestCount?.toLocaleString()}
-            </span>
+            </p></span>
+
           </div>
         </th>
         {!lienthong && !app && (
@@ -262,7 +265,13 @@ const Table: React.FC<TableProps> = ({
         </td>
         {!lienthong && (
           <td className="items-center whitespace-normal px-6 py-3 text-left">
-            {bucket.key}
+            <span
+              className="text-blue-600 font-semibold cursor-pointer hover:underline"
+              title="Xem chi tiết dịch vụ này"
+              onClick={() => router.push(`/services/detail?search=${encodeURIComponent(bucket.key)}`)}
+            >
+              {bucket.key}
+            </span>
           </td>
         )}
         <td className="items-center whitespace-normal px-6 py-3 text-left" style={{ textAlign: "justify" }}>
@@ -273,7 +282,7 @@ const Table: React.FC<TableProps> = ({
             onClick={() => setSelectedOption3(bucket.key)}
             href={`/details?startDay=${startDate}&endDay=${endDate}`}
           >
-            {lienthong && "Tổng:"}
+            {lienthong && "Tổng: "}
             <a style={{ color: lienthong ? "black" : "" }} className={!lienthong ? "text-blue-600" : ""}>
               {bucket.doc_count?.toLocaleString()}
             </a>
@@ -298,7 +307,7 @@ const Table: React.FC<TableProps> = ({
     if (index === 0 && matchingCount !== 0 && !loading) {
       const successPercentage = Math.round((matchingCount / bucket.doc_count) * 100);
       const failurePercentage = Math.round(((bucket.doc_count - matchingCount) / bucket.doc_count) * 100);
-      
+
       return (
         <>
           <p style={{ fontSize: 13 }}>
@@ -314,7 +323,7 @@ const Table: React.FC<TableProps> = ({
     if (index === 1 && matchingCount2 !== 0 && !loading) {
       const successPercentage = Math.round(((bucket.doc_count - matchingCount2) / bucket.doc_count) * 100);
       const failurePercentage = Math.round((matchingCount2 / bucket.doc_count) * 100);
-      
+
       return (
         <>
           <p style={{ fontSize: 13 }}>
