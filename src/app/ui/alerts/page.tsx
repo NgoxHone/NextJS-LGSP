@@ -33,7 +33,7 @@ const Alerts = () => {
               </svg>
             </div>
             <div className="w-full">
-              <h5 className="mb-3 text-lg font-semibold text-[#9D5425]">
+              <h5 className="mb-3 text-lg  text-[#9D5425]">
                 Attention needed
               </h5>
               <p className="leading-relaxed text-[#D0915C]">
@@ -61,7 +61,7 @@ const Alerts = () => {
               </svg>
             </div>
             <div className="w-full">
-              <h5 className="mb-3 text-lg font-semibold text-black dark:text-[#34D399] ">
+              <h5 className="mb-3 text-lg  text-black dark:text-[#34D399] ">
                 Message Sent Successfully
               </h5>
               <p className="text-base leading-relaxed text-body">
@@ -88,7 +88,7 @@ const Alerts = () => {
               </svg>
             </div>
             <div className="w-full">
-              <h5 className="mb-3 font-semibold text-[#B45454]">
+              <h5 className="mb-3  text-[#B45454]">
                 There were 1 errors with your submission
               </h5>
               <ul>
