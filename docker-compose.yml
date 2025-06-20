@@ -12,5 +12,4 @@ services:
     environment:
       - NODE_ENV=production  # Định nghĩa môi trường để đảm bảo ứng dụng chạy đúng cấu hình
       - PORT=3000  # Đảm bảo ứng dụng trong container lắng nghe trên cổng 3000
-    network_mode: "host"
 
