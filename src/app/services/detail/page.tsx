@@ -169,7 +169,7 @@ const ServiceDetailPage = () => {
                                         <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white">Tên dịch vụ</th>
                                         <th className="min-w-[180px] px-4 py-4 font-medium text-black dark:text-white">Context</th>
                                         <th className="min-w-[180px] px-4 py-4 font-medium text-black dark:text-white cursor-pointer select-none" onClick={handleSortClick}>
-                                            Thời gian tích hợp
+                                            Thời gian tạo
                                             <span className="inline-block ml-2 align-middle">
                                                 {sortOrder === null && <FaSort className="inline" />}
                                                 {sortOrder === 'asc' && <FaSortUp className="inline" />}

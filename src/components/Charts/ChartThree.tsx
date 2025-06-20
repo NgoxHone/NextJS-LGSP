@@ -76,7 +76,7 @@ const ChartThree: React.FC<ChartThreeProps> = ({ data, title }) => {
     >
       <div className="mb-3 justify-between gap-4 sm:flex">
         <div>
-          <h5 className="text-xl  text-black dark:text-white">
+          <h5 className="text-xl font-semibold text-black dark:text-white">
             {title}
           </h5>
         </div>

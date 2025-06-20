@@ -237,7 +237,7 @@ const Table: React.FC<TableProps> = ({
         </th>
         <th className="px-6 py-3 text-left text-sm font-medium uppercase dark:bg-meta-4 xsm:text-base">
           <div className="flex flex-col items-start">
-            <span>Request <p className="text-sm  text-blue-600 text-center">
+            <span>Request <p className="text-sm font-semibold text-blue-600 text-center">
               {totalRequestCount?.toLocaleString()}
             </p></span>
 
@@ -266,7 +266,7 @@ const Table: React.FC<TableProps> = ({
         {!lienthong && (
           <td className="items-center whitespace-normal px-6 py-3 text-left">
             <span
-              className="text-blue-600  cursor-pointer hover:underline"
+              className="text-blue-600 font-semibold cursor-pointer hover:underline"
               title="Xem chi tiết dịch vụ này"
               onClick={() => router.push(`/services/detail?search=${encodeURIComponent(bucket.key)}`)}
             >
