@@ -1,0 +1,76 @@
+{
+  "API_ID": 19,
+  "API_NAME": "HTTTNTW",
+  "API_VERSION": "1.0",
+  "CONTEXT": "/apiHTTTNTW/1.0",
+  "API_CREATED_TIME": "2023-11-25T02:40:45.000Z",
+  "APPLICATION_NAMES": [
+    "T3H",
+    "HTTTNCaMau"
+  ],
+  "fields": [
+    {
+      "name": "12",
+      "type": "12",
+      "description": "12"
+    }
+  ],
+  "body": [
+    {
+      "name": "12",
+      "type": "12",
+      "description": "12"
+    }
+  ],
+  "headers": [
+    {
+      "key": "12",
+      "value": "12",
+      "description": "12"
+    }
+  ],
+  "methods": [
+    {
+      "method": "GET",
+      "summary": "/api/getDoc",
+      "headers": [],
+      "fields": [],
+      "body": [
+        {
+          "name": "1212",
+          "type": "1212",
+          "description": "1212"
+        }
+      ],
+      "response": [],
+      "example": {}
+    },
+    {
+      "method": "POST",
+      "summary": "",
+      "headers": [],
+      "fields": [],
+      "body": [],
+      "response": [],
+      "example": {}
+    },
+    {
+      "method": "GET",
+      "summary": "",
+      "headers": [],
+      "fields": [],
+      "body": [],
+      "response": [],
+      "example": {}
+    },
+    {
+      "method": "POST",
+      "summary": "",
+      "headers": [],
+      "fields": [],
+      "body": [],
+      "response": [],
+      "example": {}
+    }
+  ]
+}

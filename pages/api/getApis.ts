@@ -11,26 +11,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       database: 'APIM_DB',
     });
 
-    const [rows] = await connection.execute(`
-      SELECT 
-        a.API_ID, 
-        a.API_NAME,
-        a.API_VERSION,
-        a.CONTEXT,
-        a.CREATED_TIME AS API_CREATED_TIME,
-        b.APPLICATION_ID,
-        c.NAME AS APPLICATION_NAME,
-        c.APPLICATION_TIER,
-        c.APPLICATION_STATUS,
-        b.SUB_STATUS AS SUBSCRIPTION_STATUS,
-        b.CREATED_TIME AS SUBSCRIPTION_CREATED_TIME
-      FROM 
-        AM_API a
-      JOIN 
-        AM_SUBSCRIPTION b ON a.API_ID = b.API_ID
-      JOIN 
-        AM_APPLICATION c ON b.APPLICATION_ID = c.APPLICATION_ID
-    `);
+    const { id } = req.query;
+    let rows;
+    if (id) {
+      [rows] = await connection.execute(`
+        SELECT 
+          a.API_ID, 
+          a.API_NAME,
+          a.API_VERSION,
+          a.CONTEXT,
+          a.CREATED_TIME AS API_CREATED_TIME,
+          b.APPLICATION_ID,
+          c.NAME AS APPLICATION_NAME,
+          c.APPLICATION_TIER,
+          c.APPLICATION_STATUS,
+          b.SUB_STATUS AS SUBSCRIPTION_STATUS,
+          b.CREATED_TIME AS SUBSCRIPTION_CREATED_TIME
+        FROM 
+          AM_API a
+        JOIN 
+          AM_SUBSCRIPTION b ON a.API_ID = b.API_ID
+        JOIN 
+          AM_APPLICATION c ON b.APPLICATION_ID = c.APPLICATION_ID
+        WHERE a.API_ID = ?
+      `, [id]);
+    } else {
+      [rows] = await connection.execute(`
+        SELECT 
+          a.API_ID, 
+          a.API_NAME,
+          a.API_VERSION,
+          a.CONTEXT,
+          a.CREATED_TIME AS API_CREATED_TIME,
+          b.APPLICATION_ID,
+          c.NAME AS APPLICATION_NAME,
+          c.APPLICATION_TIER,
+          c.APPLICATION_STATUS,
+          b.SUB_STATUS AS SUBSCRIPTION_STATUS,
+          b.CREATED_TIME AS SUBSCRIPTION_CREATED_TIME
+        FROM 
+          AM_API a
+        JOIN 
+          AM_SUBSCRIPTION b ON a.API_ID = b.API_ID
+        JOIN 
+          AM_APPLICATION c ON b.APPLICATION_ID = c.APPLICATION_ID
+      `);
+    }
     await connection.end();
 
     // Group by API_ID
@@ -54,7 +80,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     const result = Array.from(apiMap.values());
 
-    res.status(200).json(result);
+    if (id) {
+      res.status(200).json(result[0] || null);
+    } else {
+      res.status(200).json(result);
+    }
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }

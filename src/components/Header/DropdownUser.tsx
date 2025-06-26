@@ -19,6 +19,7 @@ const DropdownUser = () => {
   const [expiresAt, setExpiresAt] = useRecoilState(expiresAtState);
   const Logout = () => {
     if (typeof window !== "undefined") {
+      const logoutUrl = `${CONFIG.LOGOUT_URL}?post_logout_redirect_uri=${CONFIG.REDIRECT_URI}&id_token_hint=${idToken}&state=state_1`;
       Cookies.remove("accessToken");
       Cookies.remove("idToken");
       Cookies.remove("expiresAt");
@@ -26,7 +27,7 @@ const DropdownUser = () => {
       setIdToken("");
       setExpiresAt(0);
 
-      const logoutUrl = `${CONFIG.LOGOUT_URL}?post_logout_redirect_uri=${CONFIG.REDIRECT_URI}&id_token_hint=${idToken}`;
+      console.log(logoutUrl)
       window.location.href = logoutUrl;
     }
   };

@@ -316,7 +316,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .btn-style700::before {
   width: 0;
   height: 100%;
-  border-width: 0px 0 3px 0;
+  /* border-width: 0px 0 3px 0; */
 }
 
 /* .btn-style700::after {
@@ -327,7 +327,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .btn-style700:hover::before {
   width: 100%;
-  border-width: 0px 0 3px 0;
+  /* border-width: 0px 0 3px 0; */
 }
 
 /* .btn-style700:hover::after {
@@ -382,7 +382,7 @@ input[type="search"]::-webkit-search-cancel-button {
   width: 5px;
   height: 10px;
   border: solid #eee;
-  border-width: 0 2px 2px 0;
+  /* border-width: 0 2px 2px 0; */
   transform: rotate(45deg);
   opacity: 0;
   transition: opacity 0.25s ease;

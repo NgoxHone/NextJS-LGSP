@@ -27,7 +27,7 @@ export const optionOptionApp = atom<string | null>({
   default: null,
 });
 export const optionOption = atom<string | null>({
-  key: "optionOptionApp",
+  key: "optionOptionApp2",
   default: null,
 });
 export const matchingCountState = atom({

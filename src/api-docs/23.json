@@ -1,0 +1,31 @@
+{
+  "API_ID": 23,
+  "API_NAME": "DVC_BTXH",
+  "API_VERSION": "1.0",
+  "CONTEXT": "/ngsp-dvc-btxh/1.0",
+  "API_CREATED_TIME": "2023-11-23T16:33:40.000Z",
+  "APPLICATION_NAMES": [
+    "T3H",
+    "DVC_CaMau"
+  ],
+  "methods": [
+    {
+      "method": "GET",
+      "summary": "/api/hihi",
+      "headers": [],
+      "fields": [],
+      "body": [],
+      "response": [],
+      "example": {}
+    },
+    {
+      "method": "GET",
+      "summary": "",
+      "headers": [],
+      "fields": [],
+      "body": [],
+      "response": [],
+      "example": {}
+    }
+  ]
+}

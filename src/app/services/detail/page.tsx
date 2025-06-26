@@ -9,6 +9,8 @@ import ReactPaginate from "react-paginate";
 import { FaSort, FaSortUp, FaSortDown, FaSearch } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
+import { useEffect as useEffect2, useState as useState2 } from "react";
+import ApiDetail from "./ApiDetail";
 
 const SignIn = dynamic(() => import("../../auth/signin/page"), { ssr: false });
 const DefaultLayout = dynamic(
@@ -43,7 +45,28 @@ const ServiceDetailPage = () => {
     const searchParams = useSearchParams();
     const [fromDate, setFromDate] = useState<string>("");
     const [toDate, setToDate] = useState<string>("");
-    console.log(apis)
+    const [apiDetail, setApiDetail] = useState2<any>(null);
+    const [loadingDetail, setLoadingDetail] = useState2(false);
+    const [errorDetail, setErrorDetail] = useState2("");
+    const id = searchParams.get("id");
+
+    useEffect2(() => {
+        if (!id) return;
+        setLoadingDetail(true);
+        fetch(`/api/getApis?id=${id}`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Không tìm thấy API hoặc lỗi server");
+                return res.json();
+            })
+            .then((data) => {
+                if (!data) throw new Error("Không tìm thấy API");
+                setApiDetail(data);
+                setErrorDetail("");
+            })
+            .catch((err) => setErrorDetail(err.message))
+            .finally(() => setLoadingDetail(false));
+    }, [id]);
+
     useEffect(() => {
         if (accessToken) {
             setLoading(true);
@@ -122,116 +145,137 @@ const ServiceDetailPage = () => {
 
     return (
         <>
-            {!accessToken ? (
-                <SignIn />
-            ) : (
-                <DefaultLayout>
-                    <Breadcrumb pageName="Chi tiết dịch vụ" />
-                    <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1 mt-6">
-                        {/* <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">Danh sách API</h2> */}
-                        <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
-                            <div className="relative w-full max-w-xs">
-                                <input
-                                    type="text"
-                                    className="w-full rounded border border-stroke px-4 py-2 pl-10 text-sm focus:border-primary focus:outline-none dark:bg-boxdark dark:text-white"
-                                    placeholder="Tìm kiếm theo tên dịch vụ hoặc context..."
-                                    value={search}
-                                    onChange={e => setSearch(e.target.value)}
-                                />
-                                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <label className="text-sm text-gray-600 dark:text-gray-300">Từ ngày</label>
-                                <input
-                                    type="date"
-                                    className="rounded border border-stroke px-2 py-1 text-sm focus:border-primary focus:outline-none dark:bg-boxdark dark:text-white"
-                                    value={fromDate}
-                                    onChange={e => setFromDate(e.target.value)}
-                                    max={toDate || undefined}
-                                />
-                                <label className="text-sm text-gray-600 dark:text-gray-300">Đến ngày</label>
-                                <input
-                                    type="date"
-                                    className="rounded border border-stroke px-2 py-1 text-sm focus:border-primary focus:outline-none dark:bg-boxdark dark:text-white"
-                                    value={toDate}
-                                    onChange={e => setToDate(e.target.value)}
-                                    min={fromDate || undefined}
-                                />
-                            </div>
-                        </div>
-                        {loading && <p style={{ marginBottom: 10 }}>Đang tải dữ liệu...</p>}
-                        {error && <p style={{ color: 'red' }}>{error}</p>}
-                        <div className="max-w-full overflow-x-auto">
-                            <table className="w-full table-auto">
-                                <thead>
-                                    <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                        <th className="min-w-[40px] px-4 py-4 font-medium text-black dark:text-white">STT</th>
-                                        <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white">Tên dịch vụ</th>
-                                        <th className="min-w-[180px] px-4 py-4 font-medium text-black dark:text-white">Context</th>
-                                        <th className="min-w-[180px] px-4 py-4 font-medium text-black dark:text-white cursor-pointer select-none" onClick={handleSortClick}>
-                                            Thời gian tạo
-                                            <span className="inline-block ml-2 align-middle">
-                                                {sortOrder === null && <FaSort className="inline" />}
-                                                {sortOrder === 'asc' && <FaSortUp className="inline" />}
-                                                {sortOrder === 'desc' && <FaSortDown className="inline" />}
-                                            </span>
-                                        </th>
-                                        <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white">Phần mềm</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {currentItems.map((api, idx) => {
+            {id ? (
+                <ApiDetail />
 
-                                        return (
-                                            <tr key={idx} className="border-b border-[#eee] dark:border-strokedark">
-                                                <td className="px-4 py-4">{currentPage * ITEMS_PER_PAGE + idx + 1}</td>
-                                                <td className="px-4 py-4 font-semibold text-black dark:text-white">{api.API_NAME}</td>
-                                                <td className="px-4 py-4">{api.CONTEXT}</td>
-                                                <td className="px-4 py-4">{formatDateTime(api.API_CREATED_TIME)}</td>
-                                                <td className="px-4 py-4">
-                                                    {Array.isArray(api.APPLICATION_NAMES) && api.APPLICATION_NAMES.length > 0 ? (
-                                                        <div className="flex flex-wrap">
-                                                            {api.APPLICATION_NAMES.map((name: string, i: number) => {
-                                                                return (
-                                                                    <Tag key={i}>{name}</Tag>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-gray-400 italic">Không có</span>
-                                                    )}
-                                                </td>
+            ) : (
+                <>
+                    {!accessToken ? (
+                        <SignIn />
+                    ) : (
+                        <DefaultLayout>
+                            <Breadcrumb pageName="Chi tiết dịch vụ" />
+                            <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1 mt-6">
+                                {/* <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">Danh sách API</h2> */}
+                                <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
+                                    <div className="relative w-full max-w-xs">
+                                        <input
+                                            type="text"
+                                            className="w-full rounded border border-stroke px-4 py-2 pl-10 text-sm focus:border-primary focus:outline-none dark:bg-boxdark dark:text-white"
+                                            placeholder="Tìm kiếm theo tên dịch vụ hoặc context..."
+                                            value={search}
+                                            onChange={e => setSearch(e.target.value)}
+                                        />
+                                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    </div>
+                                    <div className="flex gap-2 items-center">
+                                        <label className="text-sm text-gray-600 dark:text-gray-300">Từ ngày</label>
+                                        <input
+                                            type="date"
+                                            className="rounded border border-stroke px-2 py-1 text-sm focus:border-primary focus:outline-none dark:bg-boxdark dark:text-white"
+                                            value={fromDate}
+                                            onChange={e => setFromDate(e.target.value)}
+                                            max={toDate || undefined}
+                                        />
+                                        <label className="text-sm text-gray-600 dark:text-gray-300">Đến ngày</label>
+                                        <input
+                                            type="date"
+                                            className="rounded border border-stroke px-2 py-1 text-sm focus:border-primary focus:outline-none dark:bg-boxdark dark:text-white"
+                                            value={toDate}
+                                            onChange={e => setToDate(e.target.value)}
+                                            min={fromDate || undefined}
+                                        />
+                                    </div>
+                                </div>
+                                {loading && <p style={{ marginBottom: 10 }}>Đang tải dữ liệu...</p>}
+                                {error && <p style={{ color: 'red' }}>{error}</p>}
+                                <div className="max-w-full overflow-x-auto">
+                                    <table className="w-full table-auto">
+                                        <thead>
+                                            <tr className="bg-gray-2 text-left dark:bg-meta-4">
+                                                <th className="min-w-[40px] px-4 py-4 font-medium text-black dark:text-white">STT</th>
+                                                <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white">Tên dịch vụ</th>
+                                                <th className="min-w-[180px] px-4 py-4 font-medium text-black dark:text-white">Context</th>
+                                                <th className="min-w-[180px] px-4 py-4 font-medium text-black dark:text-white cursor-pointer select-none" onClick={handleSortClick}>
+                                                    Thời gian tạo
+                                                    <span className="inline-block ml-2 align-middle">
+                                                        {sortOrder === null && <FaSort className="inline" />}
+                                                        {sortOrder === 'asc' && <FaSortUp className="inline" />}
+                                                        {sortOrder === 'desc' && <FaSortDown className="inline" />}
+                                                    </span>
+                                                </th>
+                                                <th className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white">Phần mềm</th>
+                                                <th className="min-w-[80px] px-4 py-4 font-medium text-black dark:text-white text-center">Thao tác</th>
                                             </tr>
-                                        )
-                                    })}
-                                    {(!currentItems || currentItems.length === 0) && !loading && (
-                                        <tr>
-                                            <td colSpan={5} className="px-4 py-4 text-center text-gray-500">Không có dữ liệu</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        {/* <div className="flex justify-center mt-6">
-              <ReactPaginate
-                previousLabel={"<"}
-                nextLabel={">"}
-                breakLabel={"..."}
-                pageCount={pageCount}
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={3}
-                onPageChange={handlePageClick}
-                containerClassName={"flex items-center space-x-2"}
-                pageClassName={"px-3 py-1 rounded border border-gray-300 dark:border-strokedark cursor-pointer"}
-                activeClassName={"bg-primary text-white border-primary"}
-                previousClassName={"px-3 py-1 rounded border border-gray-300 dark:border-strokedark cursor-pointer"}
-                nextClassName={"px-3 py-1 rounded border border-gray-300 dark:border-strokedark cursor-pointer"}
-                disabledClassName={"opacity-50 cursor-not-allowed"}
-                forcePage={currentPage}
-              />
-            </div> */}
-                    </div>
-                </DefaultLayout>
+                                        </thead>
+                                        <tbody>
+                                            {currentItems.map((api, idx) => {
+
+                                                return (
+                                                    <tr key={idx} className="border-b border-[#eee] dark:border-strokedark">
+                                                        <td className="px-4 py-4">{currentPage * ITEMS_PER_PAGE + idx + 1}</td>
+                                                        <td className="px-4 py-4 font-semibold text-black dark:text-white">{api.API_NAME}</td>
+                                                        <td className="px-4 py-4">{api.CONTEXT}</td>
+                                                        <td className="px-4 py-4">{formatDateTime(api.API_CREATED_TIME)}</td>
+                                                        <td className="px-4 py-4">
+                                                            {Array.isArray(api.APPLICATION_NAMES) && api.APPLICATION_NAMES.length > 0 ? (
+                                                                <div className="flex flex-wrap">
+                                                                    {api.APPLICATION_NAMES.map((name: string, i: number) => {
+                                                                        return (
+                                                                            <Tag key={i}>{name}</Tag>
+                                                                        )
+                                                                    })}
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-gray-400 italic">Không có</span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-4 py-4 text-center">
+                                                            <button
+                                                                title="Xem chi tiết"
+                                                                className="hover:text-blue-600"
+                                                                onClick={() => {
+                                                                    if (api.API_ID) window.location.href = `/services/detail?id=${encodeURIComponent(api.API_ID)}`;
+                                                                }}
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                                                    <path fill="currentColor" d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8a3 3 0 100 6 3 3 0 000-6z" />
+                                                                </svg>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })}
+                                            {(!currentItems || currentItems.length === 0) && !loading && (
+                                                <tr>
+                                                    <td colSpan={5} className="px-4 py-4 text-center text-gray-500">Không có dữ liệu</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {/* <div className="flex justify-center mt-6">
+                                  <ReactPaginate
+                                    previousLabel={"<"}
+                                    nextLabel={">"}
+                                    breakLabel={"..."}
+                                    pageCount={pageCount}
+                                    marginPagesDisplayed={2}
+                                    pageRangeDisplayed={3}
+                                    onPageChange={handlePageClick}
+                                    containerClassName={"flex items-center space-x-2"}
+                                    pageClassName={"px-3 py-1 rounded border border-gray-300 dark:border-strokedark cursor-pointer"}
+                                    activeClassName={"bg-primary text-white border-primary"}
+                                    previousClassName={"px-3 py-1 rounded border border-gray-300 dark:border-strokedark cursor-pointer"}
+                                    nextClassName={"px-3 py-1 rounded border border-gray-300 dark:border-strokedark cursor-pointer"}
+                                    disabledClassName={"opacity-50 cursor-not-allowed"}
+                                    forcePage={currentPage}
+                                  />
+                                </div> */}
+                            </div>
+                        </DefaultLayout>
+                    )}
+                </>
             )}
         </>
     );

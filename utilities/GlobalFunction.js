@@ -360,3 +360,17 @@ export const checkResponses = async (correlationIds) => {
 //       return "bg-gray-500 text-white border-gray-700"; // Không xác định
 //   }
 // };
+
+export function formatVietnamTime(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour12: false,
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
+}
