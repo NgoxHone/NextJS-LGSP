@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Transition } from '@headlessui/react';
@@ -10,6 +11,9 @@ const Modal = ({ showModal, setShowModal, children }) => {
       }
     };
   
+    // Sửa lỗi window is not defined khi build SSR
+    if (typeof window === "undefined") return null;
+
     return ReactDOM.createPortal(
       <Transition
         show={showModal}

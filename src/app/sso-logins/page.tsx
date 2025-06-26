@@ -6,14 +6,16 @@ import { FaSearch, FaSignInAlt, FaSignOutAlt, FaFilter, FaChartBar, FaUsers, FaG
 import SignIn from "../auth/signin/page";
 import { useRecoilState } from "recoil";
 import { accessTokenState } from "../../../utilities/Atom/atom";
-import ChartThree from "@/components/Charts/ChartThree";
 import ReactPaginate from "react-paginate";
 import Table from '@/components/CommonTable/Table';
 import { TableColumn, DropdownOption } from '@/components/CommonTable/types';
 import { TableApiResponse } from '@/components/CommonTable/types';
 import { TableCustom } from '@/components/CommonTable/Table';
+import dynamic from "next/dynamic";
 
 const ITEMS_PER_PAGE = 10;
+
+const ChartThree = dynamic(() => import("@/components/Charts/ChartThree"), { ssr: false });
 
 const SsoLoginsPage = () => {
     const [accessToken] = useRecoilState(accessTokenState);

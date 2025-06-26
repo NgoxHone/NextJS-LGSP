@@ -1,5 +1,6 @@
+"use client";
 import { ApexOptions } from "apexcharts";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { FaChartBar, FaChartPie } from "react-icons/fa";
 
@@ -89,7 +90,6 @@ const ChartThree: React.FC<ChartThreeProps> = ({ data, title }) => {
       },
     ],
   };
-
   return (
     <div
       style={{ maxWidth: "50vw" }}
