@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { useRecoilState } from "recoil";
 import { accessTokenState } from "../../../../utilities/Atom/atom";
 import { formatVietnamTime } from "../../../../utilities/GlobalFunction";
-import CkEditor from "@/components/CkEditor";
+const CkEditor = dynamic(() => import('@/components/CkEditor'), { ssr: false });
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
