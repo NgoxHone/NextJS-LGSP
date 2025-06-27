@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^44.1.0",
+    "@ckeditor/ckeditor5-react": "^9.4.0",
+    "ckeditor5": "^44.1.0",
     "@elastic/elasticsearch": "^7.10.0",
     "@fontsource/inter": "^5.2.6",
     "@headlessui/react": "^2.1.2",

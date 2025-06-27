@@ -6,6 +6,9 @@ import dynamic from "next/dynamic";
 import { useRecoilState } from "recoil";
 import { accessTokenState } from "../../../../utilities/Atom/atom";
 import { formatVietnamTime } from "../../../../utilities/GlobalFunction";
+import CkEditor from "@/components/CkEditor";
+// import { CKEditor } from "@ckeditor/ckeditor5-react";
+// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const DefaultLayout = dynamic(
     () => import("@/components/Layouts/DefaultLayout"),
@@ -106,6 +109,7 @@ const ApiDetail = () => {
     const methodsEndRef = useRef<HTMLDivElement>(null);
     const [lastAddedMethodIdx, setLastAddedMethodIdx] = useState<number | null>(null);
     const [prevMethodsCount, setPrevMethodsCount] = useState(0);
+    const [editMode, setEditMode] = useState(true);
 
     useEffect(() => {
         if (!id) return;
@@ -281,12 +285,30 @@ const ApiDetail = () => {
                                 <span className="text-2xl font-mono font-bold text-gray-900 dark:text-gray-100">
                                     {editApi.API_NAME || "/endpoint"}
                                 </span>
+                                {/* Switch bật/tắt chỉnh sửa */}
+                                <label className="flex items-center space-x-2 cursor-pointer select-none">
+                                    <span className="text-sm">Chỉnh sửa</span>
+                                    <input
+                                        type="checkbox"
+                                        checked={editMode}
+                                        onChange={() => setEditMode(v => !v)}
+                                        className="form-checkbox h-5 w-5 text-blue-600"
+                                    />
+                                </label>
                             </div>
-                            {editApi.description && (
-                                <p className="text-gray-600 dark:text-gray-400 mb-3 text-lg">
-                                    {editApi.description}
-                                </p>
-                            )}
+                            {/* CKEditor cho mô tả API cha */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mô tả API</label>
+                                {editMode ? (
+                                    <CkEditor
+                                        editorData={editApi.description || ""}
+                                        setEditorData={data => handleChange("description", data)}
+                                        handleOnUpdate={(data) => handleChange("description", data)}
+                                    />
+                                ) : (
+                                    <div className="prose max-w-none mb-3 text-lg" dangerouslySetInnerHTML={{ __html: editApi.description }} />
+                                )}
+                            </div>
                             <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
                                 {editApi.API_CREATED_TIME && (
                                     <span>Ngày tạo: {formatVietnamTime(editApi.API_CREATED_TIME)}</span>
@@ -385,6 +407,7 @@ const ApiDetail = () => {
                                                                                 className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none transition-colors duration-150"
                                                                                 value={m.method}
                                                                                 onChange={e => handleMethodChange(m._idx, 'method', e.target.value)}
+                                                                                disabled={!editMode}
                                                                             >
                                                                                 <option>GET</option>
                                                                                 <option>POST</option>
@@ -402,12 +425,26 @@ const ApiDetail = () => {
                                                                                 placeholder="Endpoint"
                                                                                 value={m.summary}
                                                                                 onChange={e => handleMethodChange(m._idx, 'summary', e.target.value)}
+                                                                                disabled={!editMode}
                                                                             />
+                                                                        </div>
+                                                                        {/* CKEditor cho mô tả method (API con) */}
+                                                                        <div className="md:col-span-12">
+                                                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mô tả method</label>
+                                                                            {editMode ? (
+                                                                                <CkEditor
+                                                                                    editorData={m.description || ""}
+                                                                                    setEditorData={data => handleMethodChange(m._idx, "description", data)}
+                                                                                    handleOnUpdate={(data) => handleMethodChange(m._idx, "description", data)}
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="prose max-w-none mt-2" dangerouslySetInnerHTML={{ __html: m.description }} />
+                                                                            )}
                                                                         </div>
                                                                     </div>
 
                                                                     {/* Parameter Sections */}
-                                                                    {['headers', 'body', 'response'].map((section) => (
+                                                                    {['headers'].map((section) => (
                                                                         <Accordion
                                                                             key={section}
                                                                             title={
@@ -434,7 +471,7 @@ const ApiDetail = () => {
                                                                                     })}
                                                                                 >
                                                                                     <PlusIcon />
-                                                                                    <span>Thêm {section === 'headers' ? 'header' : section === 'body' ? 'body field' : 'response field'}</span>
+                                                                                    <span>Thêm {section === 'headers' ? 'header' : 'body field'}</span>
                                                                                 </button>
 
                                                                                 {(m[section] || []).length > 0 && (
@@ -472,6 +509,7 @@ const ApiDetail = () => {
                                                                                                                 placeholder={section === 'headers' ? 'Header key' : 'Field name'}
                                                                                                                 value={section === 'headers' ? item.key : item.name}
                                                                                                                 onChange={e => handleMethodArrayChange(m._idx, section, idx, section === 'headers' ? 'key' : 'name', e.target.value)}
+                                                                                                                disabled={!editMode}
                                                                                                             />
                                                                                                         </td>
                                                                                                         {section === 'headers' && (
@@ -481,6 +519,7 @@ const ApiDetail = () => {
                                                                                                                     placeholder="Header value"
                                                                                                                     value={item.value}
                                                                                                                     onChange={e => handleMethodArrayChange(m._idx, section, idx, 'value', e.target.value)}
+                                                                                                                    disabled={!editMode}
                                                                                                                 />
                                                                                                             </td>
                                                                                                         )}
@@ -491,6 +530,7 @@ const ApiDetail = () => {
                                                                                                                     placeholder="Data type"
                                                                                                                     value={item.type}
                                                                                                                     onChange={e => handleMethodArrayChange(m._idx, section, idx, 'type', e.target.value)}
+                                                                                                                    disabled={!editMode}
                                                                                                                 />
                                                                                                             </td>
                                                                                                         )}
@@ -500,12 +540,14 @@ const ApiDetail = () => {
                                                                                                                 placeholder="Description"
                                                                                                                 value={item.description}
                                                                                                                 onChange={e => handleMethodArrayChange(m._idx, section, idx, 'description', e.target.value)}
+                                                                                                                disabled={!editMode}
                                                                                                             />
                                                                                                         </td>
                                                                                                         <td className="px-4 py-3">
                                                                                                             <button
                                                                                                                 className="inline-flex items-center space-x-1 text-red-500 hover:text-red-600 text-sm outline-none"
                                                                                                                 onClick={() => handleRemoveMethodArrayItem(m._idx, section, idx)}
+                                                                                                                disabled={!editMode}
                                                                                                             >
                                                                                                                 <TrashIcon className="w-4 h-4" />
                                                                                                             </button>
@@ -519,7 +561,25 @@ const ApiDetail = () => {
                                                                             </div>
                                                                         </Accordion>
                                                                     ))}
-                                                                    {m.method === 'GET' && (
+                                                                    {/* Response as a single CKEditor */}
+                                                                    <Accordion
+                                                                        key="response"
+                                                                        title={<span className="text-base font-medium capitalize">Response</span>}
+                                                                        defaultOpen={false}
+                                                                    >
+                                                                        <div className="space-y-2">
+                                                                            {editMode ? (
+                                                                                <CkEditor
+                                                                                    editorData={m.response || ''}
+                                                                                    setEditorData={data => handleMethodChange(m._idx, 'response', data)}
+                                                                                    handleOnUpdate={data => handleMethodChange(m._idx, 'response', data)}
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: m.response }} />
+                                                                            )}
+                                                                        </div>
+                                                                    </Accordion>
+                                                                    {/* {m.method === 'GET' && (
                                                                         <Accordion
                                                                             key="fields"
                                                                             title={
@@ -575,6 +635,7 @@ const ApiDetail = () => {
                                                                                                                 placeholder="Field name"
                                                                                                                 value={item.name}
                                                                                                                 onChange={e => handleMethodArrayChange(m._idx, 'fields', idx, 'name', e.target.value)}
+                                                                                                                disabled={!editMode}
                                                                                                             />
                                                                                                         </td>
                                                                                                         <td className="px-4 py-3">
@@ -583,6 +644,7 @@ const ApiDetail = () => {
                                                                                                                 placeholder="Data type"
                                                                                                                 value={item.type}
                                                                                                                 onChange={e => handleMethodArrayChange(m._idx, 'fields', idx, 'type', e.target.value)}
+                                                                                                                disabled={!editMode}
                                                                                                             />
                                                                                                         </td>
                                                                                                         <td className="px-4 py-3">
@@ -591,12 +653,14 @@ const ApiDetail = () => {
                                                                                                                 placeholder="Description"
                                                                                                                 value={item.description}
                                                                                                                 onChange={e => handleMethodArrayChange(m._idx, 'fields', idx, 'description', e.target.value)}
+                                                                                                                disabled={!editMode}
                                                                                                             />
                                                                                                         </td>
                                                                                                         <td className="px-4 py-3">
                                                                                                             <button
                                                                                                                 className="inline-flex items-center space-x-1 text-red-500 hover:text-red-600 text-sm outline-none"
                                                                                                                 onClick={() => handleRemoveMethodArrayItem(m._idx, 'fields', idx)}
+                                                                                                                disabled={!editMode}
                                                                                                             >
                                                                                                                 <TrashIcon className="w-4 h-4" />
                                                                                                                 <span>Remove</span>
@@ -610,13 +674,15 @@ const ApiDetail = () => {
                                                                                 )}
                                                                             </div>
                                                                         </Accordion>
-                                                                    )}
+                                                                    )} */}
                                                                     <Accordion title="Example" defaultOpen={false}>
                                                                         <div className="space-y-2">
-                                                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                                                JSON Example
-                                                                            </label>
-                                                                            <textarea
+                                                                            {editMode ? <CkEditor
+                                                                                editorData={m.example || ''}
+                                                                                setEditorData={data => handleMethodChange(m._idx, 'example', data)}
+                                                                                handleOnUpdate={data => handleMethodChange(m._idx, 'example', data)}
+                                                                            /> : <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: m.example }} />}
+                                                                            {/* <textarea
                                                                                 className="w-full px-3 py-2 border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono text-sm outline-none transition-colors duration-150"
                                                                                 rows={8}
                                                                                 value={JSON.stringify(m.example, null, 2)}
@@ -626,7 +692,7 @@ const ApiDetail = () => {
                                                                                     handleMethodChange(m._idx, 'example', val);
                                                                                 }}
                                                                                 placeholder='{\n  "example": "data"\n}'
-                                                                            />
+                                                                            /> */}
                                                                         </div>
                                                                     </Accordion>
                                                                 </div>
